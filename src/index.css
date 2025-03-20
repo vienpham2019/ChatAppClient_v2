@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+@theme static {
+  --cl-prim-100: var(--color-blue-100);
+  --cl-prim-400: var(--color-blue-400);
+  --cl-prim-500: var(--color-blue-500);
+  --cl-prim-600: var(--color-blue-600);
+  --cl-prim-700: var(--color-blue-700);
+  --cl-prim-800: var(--color-blue-800);
+
+  --cl-snd-0: var(--color-white);
+  --cl-snd-50: var(--color-gray-50);
+  --cl-snd-300: var(--color-gray-300);
+  --cl-snd-500: var(--color-gray-500);
+  --cl-snd-700: var(--color-gray-700);
+  --cl-snd-1000: var(--color-black);
+}
