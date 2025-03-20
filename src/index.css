@@ -12,6 +12,10 @@
   --cl-snd-50: var(--color-gray-50);
   --cl-snd-300: var(--color-gray-300);
   --cl-snd-500: var(--color-gray-500);
+  --cl-snd-600: var(--color-gray-600);
   --cl-snd-700: var(--color-gray-700);
   --cl-snd-1000: var(--color-black);
+
+  --cl-error: var(--color-red-500);
+  --cl-success: var(--color-green-600);
 }
