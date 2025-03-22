@@ -95,12 +95,12 @@ const Login = () => {
               Remember for 30 days
             </label>
           </div>
-          <a
-            href="#"
+          <Link
+            to={"/forgotPassword"}
             className="text-sm text-[var(--cl-prim-500)] hover:underline"
           >
             Forgot password
-          </a>
+          </Link>
         </div>
 
         <button
