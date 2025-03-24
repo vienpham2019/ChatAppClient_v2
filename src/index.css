@@ -18,4 +18,5 @@
 
   --cl-error: var(--color-red-500);
   --cl-success: var(--color-green-600);
+  --cl-waring: var(--color-amber-500);
 }
