@@ -1,5 +1,4 @@
 @import "tailwindcss";
-
 @theme static {
   --cl-prim-100: var(--color-blue-100);
   --cl-prim-400: var(--color-blue-400);
@@ -10,6 +9,7 @@
 
   --cl-snd-0: var(--color-white);
   --cl-snd-50: var(--color-gray-50);
+  --cl-snd-200: var(--color-gray-200);
   --cl-snd-300: var(--color-gray-300);
   --cl-snd-500: var(--color-gray-500);
   --cl-snd-600: var(--color-gray-600);
@@ -19,4 +19,22 @@
   --cl-error: var(--color-red-500);
   --cl-success: var(--color-green-600);
   --cl-waring: var(--color-amber-500);
+}
+
+:root {
+  --font-inter: "Inter", sans-serif;
+  --font-roboto-mono: "Roboto Mono", monospace;
+}
+
+body {
+  font-family: var(--font-inter);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-roboto-mono);
 }

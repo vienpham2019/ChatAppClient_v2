@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { CiWarning } from "react-icons/ci";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { GoArrowLeft } from "react-icons/go";
 import { IoMdArrowBack } from "react-icons/io";
 import { Link, useParams } from "react-router-dom";
 
@@ -295,6 +296,13 @@ const ResetPassword = () => {
           This link will expire in 24 hours. If you don't complete this now,
           you'll need to request a new link.
         </p>
+      </div>
+
+      <div className="mt-[1rem] flex justify-center text-sm text-[var(--cl-snd-500)]">
+        <Link to={"/login"} className="flex items-center gap-2 hover:underline">
+          <GoArrowLeft />
+          Back to Login
+        </Link>
       </div>
     </div>
   );

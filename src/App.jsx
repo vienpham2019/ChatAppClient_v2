@@ -4,6 +4,7 @@ import Login from "./pages/Login.jsx";
 import SignUp from "./pages/SignUp.jsx";
 import ForgotPassword from "./pages/ForgotPassword.jsx";
 import ResetPassword from "./pages/ResetPassword.jsx";
+import NotFound from "./pages/NotFound.jsx";
 
 function App() {
   return (
@@ -21,7 +22,7 @@ function App() {
           <Route path="/forgotPassword" element={<ForgotPassword />} />
           <Route path="/resetPassword/:key" element={<ResetPassword />} />
         </Route>
-        {/* <Route path="*" element={<NotFound />} /> */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
       {/* <Toaster position="bottom-right" reverseOrder={false} /> */}
     </div>
