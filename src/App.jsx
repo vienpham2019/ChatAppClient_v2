@@ -5,6 +5,8 @@ import SignUp from "./pages/SignUp.jsx";
 import ForgotPassword from "./pages/ForgotPassword.jsx";
 import ResetPassword from "./pages/ResetPassword.jsx";
 import NotFound from "./pages/NotFound.jsx";
+import Messages from "./pages/Messages.jsx";
+import MainLayout from "./layout/MainLayout.jsx";
 
 function App() {
   return (
@@ -21,6 +23,9 @@ function App() {
           <Route path="/signup" element={<SignUp />} />
           <Route path="/forgotPassword" element={<ForgotPassword />} />
           <Route path="/resetPassword/:key" element={<ResetPassword />} />
+        </Route>
+        <Route element={<MainLayout />}>
+          <Route path="/chats" element={<Messages />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
