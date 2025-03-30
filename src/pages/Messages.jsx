@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Avata from "../components/Avata";
+import Avatar from "../components/Avatar";
 import { CiSearch } from "react-icons/ci";
 import { IoMdArrowDropdown } from "react-icons/io";
 
@@ -185,7 +185,7 @@ const Messages = () => {
                     setIsMobileMenuOpen(false);
                   }}
                 >
-                  <Avata
+                  <Avatar
                     isOnline={contact.online}
                     imgUrl={`https://i.pravatar.cc/150?img=${contact.id}`}
                   />
@@ -228,7 +228,7 @@ const Messages = () => {
                     setIsMobileMenuOpen(false);
                   }}
                 >
-                  <Avata
+                  <Avatar
                     isOnline={contact.online}
                     imgUrl={`https://i.pravatar.cc/150?img=${contact.id}`}
                   />

@@ -1,5 +1,3 @@
-import React from "react";
-
 const Avatar = (
   { imgUrl, isOnline } = {
     imgUrl: "https://i.pravatar.cc/150?img=1",
