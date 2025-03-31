@@ -9,7 +9,8 @@ import { MdMenu } from "react-icons/md";
 import { FaRegCircleXmark } from "react-icons/fa6";
 import SlideXAnimation from "./SlideXAnimation";
 import Badge from "./Badge";
-import ChatMenu from "./ChatMenu";
+import ChatMenu from "../pages/ChatMenu";
+import ContactMenu from "../pages/ContactMenu";
 
 const SideBar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -53,7 +54,8 @@ const SideBar = () => {
   };
 
   const displayMenuDetails = () => {
-    return <ChatMenu />;
+    return <ContactMenu />;
+    // return <ChatMenu />;
   };
 
   return (

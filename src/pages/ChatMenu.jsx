@@ -1,8 +1,8 @@
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { CiSearch } from "react-icons/ci";
-import Avatar from "./Avatar";
+import Avatar from "../components/Avatar";
 import { useState } from "react";
-import CollapseYAnimation from "./CollapseYAnimation";
+import CollapseYAnimation from "../components/CollapseYAnimation";
 const ChatMenu = () => {
   const [activeContact, setActiveContact] = useState(1);
   const [openFavorite, setOpenFavorite] = useState(true);
