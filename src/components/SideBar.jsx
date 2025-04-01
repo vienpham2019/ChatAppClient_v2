@@ -59,7 +59,7 @@ const SideBar = () => {
   };
 
   return (
-    <div className="flex ">
+    <div className="flex">
       {!isMobileMenuOpen && (
         <div className="md:hidden fixed top-0 left-0 z-50 p-4">
           <button

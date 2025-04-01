@@ -1,4 +1,9 @@
-import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
+import {
+  IoIosArrowDown,
+  IoIosArrowUp,
+  IoMdArrowDropdown,
+  IoMdArrowDropright,
+} from "react-icons/io";
 import { CiSearch } from "react-icons/ci";
 import Avatar from "../components/Avatar";
 import { useState } from "react";
@@ -103,15 +108,15 @@ const ChatMenu = () => {
         <div className="">
           <div className="p-4 border-b border-[var(--cl-snd-200)]">
             <div
-              className="cursor-pointer flex justify-between mb-3"
+              className="cursor-pointer items-center flex gap-[0.2rem] mb-3"
               onClick={() => setOpenFavorite(!openFavorite)}
             >
-              <h3 className="text-xs font-semibold text-gray-500">FAVORITES</h3>
               {openFavorite ? (
-                <IoIosArrowDown className="text-[var(--cl-prim-500)]" />
+                <IoMdArrowDropdown className="text-[1.3rem]" />
               ) : (
-                <IoIosArrowUp className="text-[var(--cl-prim-500)]" />
+                <IoMdArrowDropright className="text-[1.3rem]" />
               )}
+              <h3 className="text-xs font-semibold text-gray-500">FAVORITES</h3>
             </div>
             <CollapseYAnimation isOpen={openFavorite}>
               <div className="space-y-1">
@@ -152,17 +157,17 @@ const ChatMenu = () => {
           </div>
           <div className="p-4">
             <div
-              className="cursor-pointer flex justify-between"
+              className="cursor-pointer flex gap-[0.2rem] items-center"
               onClick={() => setOpenDirectMsg(!openDirectMsg)}
             >
-              <h3 className="text-xs font-semibold text-gray-500 mb-3">
+              {openDirectMsg ? (
+                <IoMdArrowDropdown className="text-[1.3rem]" />
+              ) : (
+                <IoMdArrowDropright className="text-[1.3rem]" />
+              )}
+              <h3 className="text-xs font-semibold text-gray-500">
                 DIRECT MESSAGES
               </h3>
-              {openDirectMsg ? (
-                <IoIosArrowDown className="text-[var(--cl-prim-500)]" />
-              ) : (
-                <IoIosArrowUp className="text-[var(--cl-prim-500)]" />
-              )}
             </div>
             <CollapseYAnimation isOpen={openDirectMsg}>
               <div className="space-y-1">
