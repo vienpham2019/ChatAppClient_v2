@@ -11,12 +11,15 @@ import SlideXAnimation from "./SlideXAnimation";
 import Badge from "./Badge";
 import ChatMenu from "../pages/ChatMenu";
 import ContactMenu from "../pages/ContactMenu";
+import NotificationMenu from "../pages/NotificationMenu";
+import { IoIosNotificationsOutline } from "react-icons/io";
 
 const SideBar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [menuNotifications, setMenuNotifications] = useState({
     chats: 3,
     profile: 1,
+    notification: 4,
   });
   const [selectedMenu, setSelectedMenu] = useState("chats");
 
@@ -24,6 +27,7 @@ const SideBar = () => {
     Profile: <FaRegUser className="text-[1.4rem]" />,
     Chats: <LuMessagesSquare className="text-[1.5rem]" />,
     Contacts: <TiContacts className="text-[1.7rem]" />,
+    Notification: <IoIosNotificationsOutline className="text-[1.7rem]" />,
     Setting: <IoSettingsOutline className="text-[1.7rem]" />,
   };
 
@@ -37,6 +41,7 @@ const SideBar = () => {
           {Object.entries(menuIcons).map(([key, icon]) => (
             <button
               key={key + "side bar"}
+              onClick={() => setSelectedMenu(key.toLocaleLowerCase())}
               className={`${
                 selectedMenu === key.toLocaleLowerCase() &&
                 "bg-[var(--cl-prim-300)]"
@@ -54,8 +59,14 @@ const SideBar = () => {
   };
 
   const displayMenuDetails = () => {
-    return <ContactMenu />;
-    // return <ChatMenu />;
+    switch (selectedMenu) {
+      case "chats":
+        return <ChatMenu />;
+      case "contacts":
+        return <ContactMenu />;
+      case "notification":
+        return <NotificationMenu />;
+    }
   };
 
   return (

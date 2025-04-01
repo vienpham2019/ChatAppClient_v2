@@ -264,7 +264,9 @@ const ContactMenu = () => {
     <div className="flex flex-col w-70 border bg-white border-r border-[var(--cl-snd-200)] overflow-y-auto h-screen">
       <div className="border-r flex flex-col h-full">
         <div className="p-4 flex items-center gap-[1rem]">
-          <h2 className="text-xl font-semibold">Contacts</h2>
+          <h2 className="text-gray-700 font-medium flex items-center">
+            Contacts{" "}
+          </h2>
           <button
             onClick={() => {
               setSearchAddQuery("");
@@ -293,7 +295,11 @@ const ContactMenu = () => {
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
           <div ref={modalRef} className="bg-white rounded w-full max-w-md">
             <div className="flex items-center justify-between p-[0.8rem] text-black border-b border-[var(--cl-snd-200)]">
-              <h3 className="text-xl font-semibold">Add Contacts</h3>
+              <div className=" flex items-center justify-between mb-[0.5rem]">
+                <h2 className="text-gray-700 font-medium flex items-center">
+                  Add New Contacts{" "}
+                </h2>
+              </div>
               <button
                 onClick={() => setShowAddFriendModal(false)}
                 className="cursor-pointer border p-[0.2rem] rounded-full border-[var(--cl-snd-500)] text-[var(--cl-snd-500)] hover:border-[var(--cl-snd-1000)] hover:text-[var(--cl-snd-1000)]"
