@@ -44,7 +44,10 @@ const NotificationMenu = () => {
 
   const displayAcceptFriendRequest = ({ names, imgs }) => {
     return (
-      <div className="flex gap-[0.4rem] border-y border-[var(--cl-snd-300)] py-[0.5rem]">
+      <div
+        key={`AFR-${names.join(",")}`}
+        className="flex gap-[0.4rem] border-y border-[var(--cl-snd-300)] py-[0.5rem]"
+      >
         <div
           className={`flex items-center ${
             imgs[1] ? "min-w-[6rem]" : "min-w-[4rem] justify-center"
@@ -77,9 +80,9 @@ const NotificationMenu = () => {
     );
   };
 
-  const displayFriendRequest = ({ name, requestDay, img }) => {
+  const displayFriendRequest = ({ name, requestDay, img, id }) => {
     return (
-      <div className="px-4 py-2">
+      <div key={`FR-${name}${id}`} className="px-4 py-2">
         <div className="flex gap-[0.6rem] items-center">
           <Avatar imgUrl={img} />
           <div className="flex-1">

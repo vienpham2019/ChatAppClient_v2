@@ -1,12 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { FaRegEdit, FaRegTrashAlt } from "react-icons/fa";
-import { MdClose, MdOutlineBlock } from "react-icons/md";
+import { FaRegTrashAlt } from "react-icons/fa";
+import { MdClose, MdFavoriteBorder, MdOutlineBlock } from "react-icons/md";
 import Avatar from "../components/Avatar";
 import { IoIosSend, IoMdMore } from "react-icons/io";
 import { GoPlus } from "react-icons/go";
-import { CiSearch } from "react-icons/ci";
-import CollapseYAnimation from "../components/CollapseYAnimation";
 import { IoSearch } from "react-icons/io5";
+import Tooltip from "../components/Tooltip";
 
 const ContactMenu = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -22,13 +21,12 @@ const ContactMenu = () => {
     {
       id: "1",
       name: "Victoria Lane",
-
+      letter: "Favourites",
       online: true,
     },
     {
       id: "2",
       name: "Adinda Kirana",
-
       letter: "A",
     },
     {
@@ -175,6 +173,7 @@ const ContactMenu = () => {
             <div className="px-4 py-2 flex items-center justify-between hover:bg-[var(--cl-snd-50)] cursor-pointer relative">
               <div className="flex items-center gap-3">
                 <Avatar
+                  isOnline={contact.online || false}
                   imgUrl={`https://i.pravatar.cc/150?img=${contact.id}`}
                 />
                 <span className="font-medium">{contact.name}</span>
@@ -194,8 +193,8 @@ const ContactMenu = () => {
                   className={`absolute h-[120px] text-gray-700 right-[3rem] bg-white ${menuPosition} border border-[var(--cl-snd-200)] shadow py-1 z-10 w-36`}
                 >
                   <button className="cursor-pointer w-full px-4 py-2 text-sm text-left flex items-center justify-between hover:bg-gray-50">
-                    Edit
-                    <FaRegEdit />
+                    Favorite
+                    <MdFavoriteBorder />
                   </button>
                   <button className="cursor-pointer w-full px-4 py-2 text-sm text-left flex items-center justify-between  hover:bg-gray-50">
                     Block
@@ -261,21 +260,23 @@ const ContactMenu = () => {
   };
 
   return (
-    <div className="flex flex-col w-70 border bg-white border-r border-[var(--cl-snd-200)] overflow-y-auto h-screen">
-      <div className="border-r flex flex-col h-full">
+    <div className="flex flex-col w-70 bg-white border-[var(--cl-snd-200)] overflow-y-auto h-screen">
+      <div className="flex flex-col h-full">
         <div className="p-4 flex items-center gap-[1rem]">
           <h2 className="text-gray-700 font-medium flex items-center">
             Contacts{" "}
           </h2>
-          <button
-            onClick={() => {
-              setSearchAddQuery("");
-              setShowAddFriendModal(true);
-            }}
-            className="cursor-pointer w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-500"
-          >
-            <GoPlus />
-          </button>
+          <Tooltip text={"Add New Contact"} dir={"right"}>
+            <button
+              onClick={() => {
+                setSearchAddQuery("");
+                setShowAddFriendModal(true);
+              }}
+              className="cursor-pointer w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-gray-500"
+            >
+              <GoPlus />
+            </button>
+          </Tooltip>
         </div>
 
         <div className="px-[0.5rem] pb-4">
@@ -300,6 +301,7 @@ const ContactMenu = () => {
                   Add New Contacts{" "}
                 </h2>
               </div>
+
               <button
                 onClick={() => setShowAddFriendModal(false)}
                 className="cursor-pointer border p-[0.2rem] rounded-full border-[var(--cl-snd-500)] text-[var(--cl-snd-500)] hover:border-[var(--cl-snd-1000)] hover:text-[var(--cl-snd-1000)]"

@@ -8,8 +8,6 @@ const AuthLayout = () => {
       <div className="flex w-full items-center justify-center lg:w-1/2">
         <div className="w-full max-w-md px-8">
           <Logo />
-
-          {/* Form */}
           <Outlet />
         </div>
       </div>
