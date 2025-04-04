@@ -27,7 +27,7 @@ const Tooltip = ({ text, dir = "top", children }) => {
     }
     return (
       <div
-        className={`z-10 absolute ${posBodyClass} mb-2 w-max px-2 py-1 text-xs text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity`}
+        className={`z-10 absolute ${posBodyClass} mb-2 w-max px-2 py-1 text-xs text-white bg-gray-800 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none`}
       >
         {text}
         <div
@@ -37,9 +37,11 @@ const Tooltip = ({ text, dir = "top", children }) => {
     );
   };
   return (
-    <div className="relative group">
-      {children}
-      {getDirection()}
+    <div className="relative">
+      <div className="group inline-block">
+        {children}
+        {getDirection()}
+      </div>
     </div>
   );
 };

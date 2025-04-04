@@ -22,8 +22,8 @@ const SideBar = () => {
     chats: 3,
     notification: 4,
   });
-  const [selectedMenu, setSelectedMenu] = useState("profile");
-  const [showProfileMenu, setShowProfileMenu] = useState(true);
+  const [selectedMenu, setSelectedMenu] = useState("setting");
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [isNightMode, setIsNightMode] = useState(false);
   const menuRef = useRef();
 
@@ -162,10 +162,10 @@ const SideBar = () => {
   return (
     <div className="flex">
       {!isMobileMenuOpen && (
-        <div className="md:hidden fixed top-0 left-0 z-50 p-4">
+        <div className="md:hidden fixed top-[1rem] left-0 z-40">
           <button
             onClick={() => setIsMobileMenuOpen(true)}
-            className="relative w-[3rem] aspect-square bg-[var(--cl-prim-600)] text-white rounded-lg flex items-center justify-center"
+            className="relative w-[2rem] aspect-square bg-[var(--cl-prim-400)] text-white rounded-r-full flex items-center justify-center"
           >
             <MdMenu className="text-[1rem]" />
           </button>
@@ -180,7 +180,7 @@ const SideBar = () => {
         <div className="flex md:hidden relative">
           <button
             onClick={() => setIsMobileMenuOpen(false)}
-            className="cursor-pointer absolute right-[1rem] p-[0.5rem] text-[var(--cl-snd-700)]"
+            className="z-20 cursor-pointer absolute top-[0.3rem] right-0 p-[0.5rem] text-white bg-[var(--cl-prim-200)] rounded-l-full"
           >
             <FaRegCircleXmark className="text-[1rem]" />
           </button>

@@ -1,11 +1,7 @@
 import { IoMdMore } from "react-icons/io";
-import { FaRegTrashAlt, FaRegUser } from "react-icons/fa";
+import { FaRegUser } from "react-icons/fa";
 import { FiPhone } from "react-icons/fi";
-import {
-  MdFavoriteBorder,
-  MdOutlineBlock,
-  MdOutlineMail,
-} from "react-icons/md";
+import { MdOutlineBlock, MdOutlineMail } from "react-icons/md";
 import { IoLocationOutline, IoSettingsOutline } from "react-icons/io5";
 import { useEffect, useRef, useState } from "react";
 import { AiOutlineQuestionCircle } from "react-icons/ai";
@@ -35,7 +31,7 @@ const ProfileMenu = () => {
             <h1 className="text-xl text-white font-medium">My Profile</h1>
             <button
               onClick={() => setShowEditMenu(!showEditMenu)}
-              className="more-btn cursor-pointer text-white text-[2rem] h-[2rem]"
+              className="more-btn cursor-pointer text-white md:w-auto w-[3rem] text-[2rem] h-[2rem]"
             >
               <IoMdMore />
             </button>
