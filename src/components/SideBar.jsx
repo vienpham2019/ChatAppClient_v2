@@ -50,7 +50,7 @@ const SideBar = () => {
 
   const displayMenu = () => {
     return (
-      <div className="flex flex-col w-[5rem] bg-gradient-to-t from-[var(--cl-prim-500)] to-[var(--cl-prim-200)] text-white items-center py-4 space-y-8">
+      <div className="flex flex-col w-[4rem] md:w-[5rem] bg-gradient-to-t from-[var(--cl-prim-500)] to-[var(--cl-prim-200)] text-white items-center py-4 space-y-8">
         <div className="flex-shrink-0">
           <Logo isMobile={true} />
         </div>
@@ -60,8 +60,8 @@ const SideBar = () => {
               {selectedMenu === key.toLocaleLowerCase() && (
                 <>
                   <div className="rounded-l-full absolute top-0 left-0 w-[4rem] h-[3rem] bg-white"></div>
-                  <div className="absolute -top-[1rem] left-[3rem] w-[1.3rem] rounded-full aspect-square  shadow-[inset_-7px_-7px_0px_-2px_rgb(255,255,255)]"></div>
-                  <div className="absolute -bottom-[0.98rem] left-[3rem] w-[1.3rem] rounded-full aspect-square shadow-[inset_-7px_7px_0px_-2px_rgb(255,255,255)]"></div>
+                  <div className="absolute -top-[1rem] left-[2.5rem] md:left-[3rem] w-[1.3rem] rounded-full aspect-square  shadow-[inset_-7px_-7px_0px_-2px_rgb(255,255,255)]"></div>
+                  <div className="absolute -bottom-[0.98rem] left-[2.5rem] md:left-[3rem] w-[1.3rem] rounded-full aspect-square shadow-[inset_-7px_7px_0px_-2px_rgb(255,255,255)]"></div>
                 </>
               )}
 
@@ -133,8 +133,8 @@ const SideBar = () => {
             {selectedMenu === "profile" && (
               <>
                 <div className="rounded-l-full absolute top-[0.01rem] -left-[0.5rem] w-[5rem] h-[4rem] bg-white"></div>
-                <div className="absolute -top-[1rem] left-[3rem] w-[1.3rem] rounded-full aspect-square  shadow-[inset_-7px_-7px_0px_-2px_rgb(255,255,255)]"></div>
-                <div className="absolute -bottom-[0.98rem] left-[3rem] w-[1.3rem] rounded-full aspect-square shadow-[inset_-7px_7px_0px_-2px_rgb(255,255,255)]"></div>
+                <div className="absolute -top-[1rem] left-[2.5rem] md:left-[3rem] w-[1.3rem] rounded-full aspect-square  shadow-[inset_-7px_-7px_0px_-2px_rgb(255,255,255)]"></div>
+                <div className="absolute -bottom-[0.98rem] left-[2.5rem] md:left-[3rem] w-[1.3rem] rounded-full aspect-square shadow-[inset_-7px_7px_0px_-2px_rgb(255,255,255)]"></div>
               </>
             )}
             <Avatar isOnline={true} imgUrl="https://i.pravatar.cc/150?img=3" />
@@ -173,7 +173,7 @@ const SideBar = () => {
       )}
       <div className="hidden md:flex">
         {displayMenu()}
-        {displayMenuDetails()}
+        <div className="w-[23rem]">{displayMenuDetails()}</div>
       </div>
 
       <SlideXAnimation isOpen={isMobileMenuOpen}>
@@ -185,7 +185,7 @@ const SideBar = () => {
             <FaRegCircleXmark className="text-[1rem]" />
           </button>
           {displayMenu()}
-          {displayMenuDetails()}
+          <div className="w-[15rem]">{displayMenuDetails()}</div>
         </div>
       </SlideXAnimation>
     </div>

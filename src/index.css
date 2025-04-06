@@ -33,6 +33,18 @@ body {
   font-family: var(--font-inter);
 }
 
+.overflow-y-auto::-webkit-scrollbar {
+  @apply w-2;
+}
+
+.overflow-y-auto::-webkit-scrollbar-track {
+  @apply bg-[var(--cl-snd-200)];
+}
+
+.overflow-y-auto::-webkit-scrollbar-thumb {
+  @apply bg-[var(--cl-snd-400)];
+}
+
 h1,
 h2,
 h3,

@@ -23,7 +23,7 @@ const ProfileMenu = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
   return (
-    <div className="flex flex-col w-72 bg-white border-r border-[var(--cl-snd-200)] overflow-y-auto h-screen">
+    <div className="flex flex-col w-full bg-white border-r border-[var(--cl-snd-200)] overflow-y-auto h-screen">
       <div className="flex-1">
         {/* Header with title and menu */}
         <div className="relative flex justify-between h-[10rem]">

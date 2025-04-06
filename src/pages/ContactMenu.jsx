@@ -218,7 +218,7 @@ const ContactMenu = () => {
       return displayNoFilterFound();
     }
     return (
-      <div className="h-[20rem] overflow-y-auto my-[1rem]">
+      <div className="h-[20rem] overflow-y-auto customScrollBar my-[1rem]">
         {filteredAddContacts.map((contact, index) => (
           <div key={contact.id}>
             {contact.letter && (
@@ -260,7 +260,7 @@ const ContactMenu = () => {
   };
 
   return (
-    <div className="flex flex-col w-70 bg-white border-[var(--cl-snd-200)] overflow-y-auto h-screen">
+    <div className="flex flex-col w-full bg-white border-[var(--cl-snd-200)] overflow-y-auto customScrollBar h-screen">
       <div className="flex flex-col h-full">
         <div className="p-4 flex items-center gap-[1rem]">
           <h2 className="text-gray-700 font-medium flex items-center">
@@ -279,7 +279,7 @@ const ContactMenu = () => {
           </Tooltip>
         </div>
 
-        <div className="px-[0.5rem] pb-4">
+        <div className="px-[0.5rem] pb-4 border-b border-[var(--cl-snd-200)]">
           <input
             type="search"
             className="block w-full p-[0.6rem] text-sm text-gray-900 border border-gray-300 rounded bg-gray-50 focus:ring-blue-500 focus:border-blue-500 "
