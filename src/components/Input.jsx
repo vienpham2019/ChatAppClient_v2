@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
-import { IoIosInformationCircleOutline } from "react-icons/io";
-import { capitalizeWords } from "../helper";
+import { useEffect, useRef, useState } from "react";
+import { formatLabel } from "../helper";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
 import CollapseYAnimation from "./CollapseYAnimation";
 
@@ -10,6 +9,9 @@ const Input = ({
   handleOnChange,
   isShowRequiredPassword = false,
   isForPassword = false,
+  isError = false,
+  isTextare = false,
+  disabled = true,
 }) => {
   const [passwordType, handleShowPassword] = useState("password");
   const [openPasswordRequied, setOpenPasswordRequied] = useState(false);
@@ -20,6 +22,21 @@ const Input = ({
     number: false,
     symbol: false,
   });
+
+  const menuRef = useRef();
+  const handleClickOutside = (e) => {
+    if (
+      menuRef.current &&
+      !menuRef.current.contains(e.target) &&
+      !e.target.closest(".passwordInput")
+    ) {
+      setOpenPasswordRequied(false);
+    }
+  };
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     if (isShowRequiredPassword) {
@@ -33,27 +50,51 @@ const Input = ({
     }
   }, [value, isShowRequiredPassword]);
 
+  const displayInput = () => {
+    if (isTextare) {
+      return (
+        <textarea
+          onChange={handleOnChange}
+          name={name}
+          value={value}
+          rows="6"
+          className={`resize-y border ${
+            isError ? "border-[var(--cl-error)]" : "border-[var(--cl-snd-300)]"
+          } p-[0.3rem] rounded w-full`}
+        />
+      );
+    }
+    return (
+      <input
+        onChange={handleOnChange}
+        type={isForPassword ? passwordType : "text"}
+        name={name}
+        value={value}
+        disabled={disabled}
+        className={`border px-[0.5rem] py-[0.3rem] rounded w-full ${
+          disabled && "cursor-not-allowed bg-[var(--cl-snd-300)] text-gray-500"
+        } ${
+          isError ? "border-[var(--cl-error)]" : "border-[var(--cl-snd-300)]"
+        } `}
+      />
+    );
+  };
+
   return (
     <div className="relative w-full text-[0.9rem]" key={name}>
       <div className="flex justify-between">
         <label className="block text-sm text-gray-600 mb-1">
-          {capitalizeWords(name)}
+          {formatLabel(name)}
         </label>
       </div>
       <div
-        className="relative"
+        className={`relative ${isShowRequiredPassword && "passwordInput"} `}
         onFocus={() => {
           setOpenPasswordRequied(isShowRequiredPassword);
         }}
       >
-        <input
-          onChange={handleOnChange}
-          type={isForPassword ? passwordType : "text"}
-          name={name}
-          value={value}
-          className="border-gray-300 border px-[0.5rem] py-[0.3rem] rounded w-full"
-        />
-        {isShowRequiredPassword && (
+        {displayInput()}
+        {isForPassword && (
           <div className="cursor-pointer absolute top-0 right-0 px-[0.3rem] border-l border-[var(--cl-snd-300)] flex items-center h-full">
             {passwordType === "password" ? (
               <FaEyeSlash
@@ -69,7 +110,10 @@ const Input = ({
           </div>
         )}
       </div>
-      <div className=" bg-[var(--cl-snd-200)] mt-[0.3rem] rounded">
+      <div
+        ref={menuRef}
+        className=" bg-[var(--cl-snd-200)] mt-[0.3rem] rounded"
+      >
         <CollapseYAnimation isOpen={openPasswordRequied}>
           <div className="space-y-2 text-[0.7rem] text-[var(--cl-snd-500)] px-[0.4rem] py-[0.2rem]">
             <p className="font-medium">Password requirements:</p>

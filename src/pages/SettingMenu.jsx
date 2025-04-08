@@ -3,14 +3,16 @@ import Tooltip from "../components/Tooltip";
 
 import { useState } from "react";
 import EditProfileForm from "./EditProfileForm";
-
 import EditPrivacyForm from "./EditPrivacyForm";
+import EditSecurityForm from "./EditSecurityForm";
+import EditHelpForm from "./EditHelpForm";
 
 const SettingMenu = () => {
   const settingMenuEmum = {
     PersonalMenu: "PersonalMenu",
     PrivacyMenu: "PrivacyMenu",
     SecurityMenu: "SecurityMenu",
+    HelpMenu: "HelpMenu",
   };
   const [openSettingMenu, setOpenSettingMenu] = useState(
     settingMenuEmum.PersonalMenu
@@ -68,6 +70,14 @@ const SettingMenu = () => {
         <EditPrivacyForm
           isOpenMenu={openSettingMenu === settingMenuEmum.PrivacyMenu}
           onSetEditMenu={() => handleOpenMenu(settingMenuEmum.PrivacyMenu)}
+        />
+        <EditSecurityForm
+          isOpenMenu={openSettingMenu === settingMenuEmum.SecurityMenu}
+          onSetEditMenu={() => handleOpenMenu(settingMenuEmum.SecurityMenu)}
+        />
+        <EditHelpForm
+          isOpenMenu={openSettingMenu === settingMenuEmum.HelpMenu}
+          onSetEditMenu={() => handleOpenMenu(settingMenuEmum.HelpMenu)}
         />
       </div>
     </div>

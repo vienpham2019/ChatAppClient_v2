@@ -32,3 +32,8 @@ export const capitalizeWords = (str) =>
     .split(" ")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
+
+export const formatLabel = (str) =>
+  str
+    .replace(/([A-Z])/g, " $1") // Add space before capital letters
+    .replace(/^./, (s) => s.toUpperCase()); // Capitalize the first letter
