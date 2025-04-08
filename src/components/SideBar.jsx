@@ -185,7 +185,9 @@ const SideBar = () => {
             <FaRegCircleXmark className="text-[1rem]" />
           </button>
           {displayMenu()}
-          <div className="w-[15rem]">{displayMenuDetails()}</div>
+          <div className="w-[15rem] min-[376px]:w-[20rem]">
+            {displayMenuDetails()}
+          </div>
         </div>
       </SlideXAnimation>
     </div>

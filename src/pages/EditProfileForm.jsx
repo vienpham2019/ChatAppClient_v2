@@ -7,20 +7,18 @@ import {
 } from "react-icons/io";
 import CollapseYAnimation from "../components/CollapseYAnimation";
 import { capitalizeWords } from "../helper";
+import Input from "../components/Input";
 
 const EditProfileForm = ({ isOpenMenu, onSetEditMenu }) => {
   const [formData, setFormData] = useState({
-    aboutMe: {
-      value:
-        "If several languages coalesce, the grammar of the resulting language is more simple and regular than that of the individual.",
-      type: "textarea",
-    },
-    name: { value: "Dushane Daniel", type: "text" },
-    phone: { value: "365 1456 12584", type: "text" },
-    email: { value: "dushanedaniel@gmail.com", type: "email" },
-    location: { value: "California, USA", type: "text" },
-    newPassword: { value: "", type: "password" },
-    confirmNewPassword: { value: "", type: "password" },
+    aboutMe:
+      "If several languages coalesce, the grammar of the resulting language is more simple and regular than that of the individual.",
+    name: "Dushane Daniel",
+    phone: "365 1456 12584",
+    email: "dushanedaniel@gmail.com",
+    location: "California, USA",
+    newPassword: "",
+    confirmNewPassword: "",
   });
 
   const [passwordValidations, setPasswordValidations] = useState({
@@ -52,7 +50,7 @@ const EditProfileForm = ({ isOpenMenu, onSetEditMenu }) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: { value, type: prevData[name].type },
+      [name]: value,
     }));
   };
   const handleShowPassword = ({ name, type }) => {
@@ -148,7 +146,7 @@ const EditProfileForm = ({ isOpenMenu, onSetEditMenu }) => {
       <CollapseYAnimation isOpen={isOpenMenu}>
         <div className="px-2 pb-4">
           <div className="space-y-[0.3rem]">
-            {Object.entries(formData).map(([key, data]) => {
+            {/* {Object.entries(formData).map(([key, data]) => {
               return (
                 <div className="relative w-full text-[0.9rem]" key={key}>
                   <div className="flex justify-between">
@@ -226,8 +224,20 @@ const EditProfileForm = ({ isOpenMenu, onSetEditMenu }) => {
                   )}
                 </div>
               );
-            })}
-
+            })} */}
+            <Input
+              name={"newPassword"}
+              value={formData.newPassword}
+              handleOnChange={handleOnChange}
+              isShowRequiredPassword={true}
+              isForPassword={true}
+            />
+            <Input
+              name={"confirmNewPassword"}
+              value={formData.confirmNewPassword}
+              handleOnChange={handleOnChange}
+              isForPassword={true}
+            />
             <button className="w-full bg-[var(--cl-prim-300)]  py-[0.2rem] rounded">
               Save
             </button>

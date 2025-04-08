@@ -3,11 +3,7 @@ import Tooltip from "../components/Tooltip";
 
 import { useState } from "react";
 import EditProfileForm from "./EditProfileForm";
-import {
-  IoMdArrowDropdown,
-  IoMdArrowDropright,
-  IoMdArrowDropup,
-} from "react-icons/io";
+
 import EditPrivacyForm from "./EditPrivacyForm";
 
 const SettingMenu = () => {
@@ -64,7 +60,7 @@ const SettingMenu = () => {
           />
         </div>
       </div>
-      <div className="border-t border-[var(--cl-snd-200)] py-[1rem] mt-[4rem] overflow-y-auto ">
+      <div className="border-t border-[var(--cl-snd-200)] py-[1rem] mt-[4rem] overflow-y-auto">
         <EditProfileForm
           isOpenMenu={openSettingMenu === settingMenuEmum.PersonalMenu}
           onSetEditMenu={() => handleOpenMenu(settingMenuEmum.PersonalMenu)}

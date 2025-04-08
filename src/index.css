@@ -53,3 +53,30 @@ h5,
 h6 {
   font-family: var(--font-roboto-mono);
 }
+
+[popover] {
+  inset: unset;
+  top: anchor(bottom);
+  left: anchor(left);
+  position-try-fallbacks: --right;
+}
+
+/* .top-left {
+  inset: unset;
+  bottom: anchor(top);
+  left: anchor(left);
+  translate: -50% -0.5rem;
+  position-try-fallbacks: --left;
+} */
+
+@position-try --right {
+  inset: unset;
+  right: anchor(right);
+  top: anchor(bottom);
+}
+
+@position-try --left {
+  inset: unset;
+  right: anchor(right);
+  top: anchor(top);
+}

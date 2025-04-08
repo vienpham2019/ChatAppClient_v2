@@ -218,7 +218,7 @@ const ContactMenu = () => {
       return displayNoFilterFound();
     }
     return (
-      <div className="h-[20rem] overflow-y-auto customScrollBar my-[1rem]">
+      <div className="h-[20rem] overflow-y-auto  my-[1rem]">
         {filteredAddContacts.map((contact, index) => (
           <div key={contact.id}>
             {contact.letter && (
