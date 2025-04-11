@@ -6,16 +6,18 @@ import EditProfileForm from "./EditProfileForm";
 import EditPrivacyForm from "./EditPrivacyForm";
 import EditSecurityForm from "./EditSecurityForm";
 import EditHelpForm from "./EditHelpForm";
+import EditThemeForm from "./EditThemeForm";
 
 const SettingMenu = () => {
   const settingMenuEmum = {
     PersonalMenu: "PersonalMenu",
+    ThemeMenu: "ThemeMenu",
     PrivacyMenu: "PrivacyMenu",
     SecurityMenu: "SecurityMenu",
     HelpMenu: "HelpMenu",
   };
   const [openSettingMenu, setOpenSettingMenu] = useState(
-    settingMenuEmum.PersonalMenu
+    settingMenuEmum.ThemeMenu
   );
 
   const handleOpenMenu = (menu) => {
@@ -66,6 +68,10 @@ const SettingMenu = () => {
         <EditProfileForm
           isOpenMenu={openSettingMenu === settingMenuEmum.PersonalMenu}
           onSetEditMenu={() => handleOpenMenu(settingMenuEmum.PersonalMenu)}
+        />
+        <EditThemeForm
+          isOpenMenu={openSettingMenu === settingMenuEmum.ThemeMenu}
+          onSetEditMenu={() => handleOpenMenu(settingMenuEmum.ThemeMenu)}
         />
         <EditPrivacyForm
           isOpenMenu={openSettingMenu === settingMenuEmum.PrivacyMenu}

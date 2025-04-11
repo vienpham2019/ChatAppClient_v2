@@ -1,5 +1,5 @@
 import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
-import { MdOutlineQuestionMark } from "react-icons/md";
+
 import CollapseYAnimation from "../components/CollapseYAnimation";
 import { FaQuestionCircle } from "react-icons/fa";
 

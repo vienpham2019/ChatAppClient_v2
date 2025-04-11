@@ -1,36 +1,34 @@
 import { useState } from "react";
-import { FaRegCheckCircle } from "react-icons/fa";
 import { IoMdArrowBack } from "react-icons/io";
 import { Link } from "react-router-dom";
+import { validateEmail } from "../helper";
+import Input from "../components/Input";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email) {
-      setEmailError("Email is required");
-      return false;
-    } else if (!emailRegex.test(email)) {
-      setEmailError("Please enter a valid email address");
-      return false;
-    }
-    setEmailError("");
-    return true;
-  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     // Add your authentication logic here
-    if (emailError) return;
+    let emailErrorMsg = validateEmail(email);
+    if (emailErrorMsg !== "") {
+      setEmailError(emailErrorMsg);
+      return;
+    }
     setIsSubmitting(true);
     // setTimeout(() => {
     //   setIsSubmitting(false);
     //   setIsSubmitted(true);
     // }, [1000]);
+  };
+
+  const handleOnChange = (e) => {
+    const { value } = e.target;
+    setEmail(value);
+    setEmailError("");
   };
 
   if (isSubmitted) {
@@ -92,26 +90,16 @@ const ForgotPassword = () => {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-[1rem]">
-          <div className="space-y-2">
-            <label htmlFor="email" className="block text-sm font-medium">
-              Email address
-            </label>
-            <input
-              type="text"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              onBlur={() => validateEmail(email)}
-              className={`h-12 w-full rounded-md border ${
-                emailError
-                  ? "border-[var(--cl-error)]"
-                  : "border-[var(--cl-snd-300)]"
-              } px-3 py-2 focus:border-[var(--cl-prim-500)] focus:outline-none focus:ring-1 focus:ring-[var(--cl-prim-500)]`}
-              placeholder="Enter your email address"
-            />
-            {emailError && (
-              <p className="text-sm text-[var(--cl-error)]">{emailError}</p>
-            )}
-          </div>
+          <Input
+            name={"Email"}
+            className={
+              "h-12 w-full rounded-md border px-3 py-2 focus:border-[var(--cl-prim-500)] focus:outline-none focus:ring-1 focus:ring-[var(--cl-prim-500)]"
+            }
+            value={email}
+            handleOnChange={handleOnChange}
+            isError={emailError !== ""}
+            errorMsg={emailError}
+          />
 
           <button
             type="submit"

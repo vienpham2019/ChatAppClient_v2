@@ -11,7 +11,9 @@ const Input = ({
   isForPassword = false,
   isError = false,
   isTextare = false,
-  disabled = true,
+  disabled = false,
+  className = "",
+  errorMsg = "",
 }) => {
   const [passwordType, handleShowPassword] = useState("password");
   const [openPasswordRequied, setOpenPasswordRequied] = useState(false);
@@ -58,9 +60,13 @@ const Input = ({
           name={name}
           value={value}
           rows="6"
-          className={`resize-y border ${
+          className={`${
             isError ? "border-[var(--cl-error)]" : "border-[var(--cl-snd-300)]"
-          } p-[0.3rem] rounded w-full`}
+          }  ${
+            className !== ""
+              ? className
+              : "resize-y border p-[0.3rem] rounded w-full"
+          }`}
         />
       );
     }
@@ -71,7 +77,13 @@ const Input = ({
         name={name}
         value={value}
         disabled={disabled}
-        className={`border px-[0.5rem] py-[0.3rem] rounded w-full ${
+        className={`
+            ${isForPassword && "pr-[2rem]"}
+            ${
+              className !== ""
+                ? className
+                : "px-[0.5rem] py-[0.3rem] border rounded w-full"
+            } ${
           disabled && "cursor-not-allowed bg-[var(--cl-snd-300)] text-gray-500"
         } ${
           isError ? "border-[var(--cl-error)]" : "border-[var(--cl-snd-300)]"
@@ -95,7 +107,7 @@ const Input = ({
       >
         {displayInput()}
         {isForPassword && (
-          <div className="cursor-pointer absolute top-0 right-0 px-[0.3rem] border-l border-[var(--cl-snd-300)] flex items-center h-full">
+          <div className="cursor-pointer absolute top-0 right-0 px-[0.5rem] border-l border-[var(--cl-snd-300)] flex items-center h-full">
             {passwordType === "password" ? (
               <FaEyeSlash
                 className="text-muted-foreground"
@@ -110,12 +122,15 @@ const Input = ({
           </div>
         )}
       </div>
+      {errorMsg !== "" && (
+        <p className="text-sm text-[var(--cl-error)]">{errorMsg}</p>
+      )}
       <div
         ref={menuRef}
         className=" bg-[var(--cl-snd-200)] mt-[0.3rem] rounded"
       >
         <CollapseYAnimation isOpen={openPasswordRequied}>
-          <div className="space-y-2 text-[0.7rem] text-[var(--cl-snd-500)] px-[0.4rem] py-[0.2rem]">
+          <div className="space-y-2 text-[0.8rem] text-[var(--cl-snd-500)] px-[0.4rem] py-[0.2rem]">
             <p className="font-medium">Password requirements:</p>
             <ul className="space-y-1 pl-5 list-disc">
               <li

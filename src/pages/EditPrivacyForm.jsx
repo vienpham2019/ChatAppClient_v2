@@ -42,9 +42,9 @@ const EditPrivacyForm = ({ isOpenMenu, onSetEditMenu }) => {
           <h3 className="text-xs font-semibold text-gray-500">Privacy</h3>
         </div>
         {isOpenMenu ? (
-          <IoMdArrowDropdown className="text-[1.3rem]" />
-        ) : (
           <IoMdArrowDropup className="text-[1.3rem]" />
+        ) : (
+          <IoMdArrowDropdown className="text-[1.3rem]" />
         )}
       </div>
       <CollapseYAnimation isOpen={isOpenMenu}>

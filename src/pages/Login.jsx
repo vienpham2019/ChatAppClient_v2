@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { FaEye, FaEyeSlash, FaGoogle } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import Input from "../components/Input";
 
 const Login = () => {
-  const [formData, setFormData] = useState({});
-  const [showPassword, setShowPassword] = useState(false);
-  const [isError, setIsError] = useState(false);
+  const [formData, setFormData] = useState({ Email: "", Password: "" });
+  const [formDataValidate, setFormDataValidate] = useState({
+    Email: "",
+    Password: "",
+  });
   const handleSubmit = (e) => {
     e.preventDefault();
     // Add your authentication logic here
@@ -16,7 +19,7 @@ const Login = () => {
     setIsError(false);
     setFormData((prevVal) => ({
       ...prevVal,
-      [name]: { value },
+      [name]: value,
     }));
   };
 
@@ -29,58 +32,19 @@ const Login = () => {
 
       {/* Form */}
       <form className="space-y-4" onSubmit={handleSubmit}>
-        <div className="space-y-2">
-          <label htmlFor="email" className="block text-sm font-medium">
-            Email address
-          </label>
-          <input
-            name="email"
-            type="email"
-            value={formData?.email?.value || ""}
-            onChange={(e) => handleOnChange(e)}
-            className={`h-12 w-full rounded-md border ${
-              isError
-                ? "border-[var(--cl-error)]"
-                : "border-[var(--cl-snd-300)]"
-            } px-3 py-2 focus:border-[var(--cl-prim-500)] focus:outline-none focus:ring-1 focus:ring-[var(--cl-prim-500)]`}
+        {Object.entries(formData).map(([key, value]) => (
+          <Input
+            name={key}
+            className={
+              "h-12 w-full rounded-md border px-3 py-2 focus:border-[var(--cl-prim-500)] focus:outline-none focus:ring-1 focus:ring-[var(--cl-prim-500)]"
+            }
+            value={value}
+            handleOnChange={handleOnChange}
+            isForPassword={key.toLocaleLowerCase().includes("password")}
+            isError={!!formDataValidate[key]}
+            errorMsg={formDataValidate[key]}
           />
-          {isError && (
-            <p className="text-sm text-[var(--cl-error)]">Invalid email</p>
-          )}
-        </div>
-
-        <div className="space-y-2">
-          <label htmlFor="password" className="block text-sm font-medium">
-            Password
-          </label>
-          <div className="relative">
-            <input
-              name="password"
-              type={showPassword ? "text" : "password"}
-              value={formData?.password?.value || ""}
-              onChange={(e) => handleOnChange(e)}
-              className={`h-12 w-full rounded-md border pr-[2.2rem] ${
-                isError
-                  ? "border-[var(--cl-error)]"
-                  : "border-[var(--cl-snd-300)]"
-              } px-3 py-2 focus:border-[var(--cl-prim-500)] focus:outline-none focus:ring-1 focus:ring-[var(--cl-prim-500)]`}
-            />
-            <button
-              onClick={() => setShowPassword(!showPassword)}
-              type="button"
-              className="absolute inset-y-0 cursor-pointer right-0 flex items-center pr-3 text-[var(--cl-snd-500)]"
-            >
-              {showPassword ? (
-                <FaEyeSlash className="text-muted-foreground" />
-              ) : (
-                <FaEye className="text-muted-foreground" />
-              )}
-            </button>
-          </div>
-          {isError && (
-            <p className="text-sm text-[var(--cl-error)]">Invalid Password</p>
-          )}
-        </div>
+        ))}
 
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">

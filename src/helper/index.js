@@ -37,3 +37,14 @@ export const formatLabel = (str) =>
   str
     .replace(/([A-Z])/g, " $1") // Add space before capital letters
     .replace(/^./, (s) => s.toUpperCase()); // Capitalize the first letter
+
+export const validateEmail = (email) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!email) {
+    return "Email is required";
+  } else if (!emailRegex.test(email)) {
+    return "Please enter a valid email address";
+  }
+  return "";
+};
