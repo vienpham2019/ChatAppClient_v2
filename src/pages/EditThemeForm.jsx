@@ -32,10 +32,10 @@ const EditThemeForm = ({ isOpenMenu, onSetEditMenu }) => {
           <div className="grid gap-[1rem] text-[0.8rem] text-[var(--cl-snd-600)]">
             <span>Choose Theme Color :</span>
             <div className="flex flex-wrap gap-[1rem]">
-              {themesColors.map((color, _) => {
+              {themesColors.map((color, i) => {
                 return (
                   <div
-                    key={"themeColor-" + color}
+                    key={`themeColor-${color}-${i}`}
                     style={{ background: color }}
                     onClick={() => setSelectColor(color)}
                     className="border border-gray-500 text-gray-500 flex items-center justify-center cursor-pointer w-[1.5rem] aspect-square rounded-full"
@@ -49,10 +49,10 @@ const EditThemeForm = ({ isOpenMenu, onSetEditMenu }) => {
           <div className="grid gap-[1rem] text-[0.8rem] text-[var(--cl-snd-600)]">
             <span>Choose Theme Image :</span>
             <div className="flex flex-wrap gap-[1rem]">
-              {themesImages.map((color, _) => {
+              {themesImages.map((color, i) => {
                 return (
                   <div
-                    key={"themeImage-" + color}
+                    key={`themeImage-${color}-${i}`}
                     style={{ background: color }}
                     onClick={() => setSelectImage(color)}
                     className="border border-gray-500 text-gray-500 flex items-center justify-center cursor-pointer w-[1.5rem] aspect-square rounded-full"

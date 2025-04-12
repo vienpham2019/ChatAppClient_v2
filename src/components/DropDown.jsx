@@ -1,6 +1,7 @@
 import { IoIosArrowDown } from "react-icons/io";
 import CollapseYAnimation from "./CollapseYAnimation";
 import { useEffect, useRef, useState } from "react";
+import { getUniqueNum } from "../helper";
 
 const DropDown = ({
   selected,
@@ -9,7 +10,7 @@ const DropDown = ({
   height = "7rem",
   width = "7rem",
 }) => {
-  const popoverId = Math.random().toString(36).substring(2, 9);
+  const popoverId = getUniqueNum();
 
   const handleSelect = (value) => {
     onSelect(value);

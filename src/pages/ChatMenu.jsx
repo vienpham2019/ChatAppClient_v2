@@ -97,11 +97,11 @@ const ChatMenu = () => {
             Messages <span className="text-xs text-gray-500 ml-1">(128)</span>
           </h2>
         </div>
-        <div className="relative border-b border-[var(--cl-snd-200)] pb-[1rem]">
+        <div className="relative border-b border-[var(--cl-snd-200)] border rounded-lg">
           <CiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[var(--cl-snd-400)]" />
           <input
             placeholder="Search here..."
-            className="pl-10 bg-gray-50 border-[var(--cl-snd-200)]"
+            className="pl-10 w-full py-[0.5rem] bg-gray-100 border-[var(--cl-snd-200)]"
           />
         </div>
 

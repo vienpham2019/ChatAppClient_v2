@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { formatLabel } from "../helper";
+import { formatLabel, getUniqueNum } from "../helper";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
 import CollapseYAnimation from "./CollapseYAnimation";
 
@@ -15,6 +15,7 @@ const Input = ({
   className = "",
   errorMsg = "",
 }) => {
+  const unidKey = getUniqueNum();
   const [passwordType, handleShowPassword] = useState("password");
   const [openPasswordRequied, setOpenPasswordRequied] = useState(false);
   const [passwordValidations, setPasswordValidations] = useState({
@@ -93,7 +94,7 @@ const Input = ({
   };
 
   return (
-    <div className="relative w-full text-[0.9rem]" key={name}>
+    <div className="relative w-full text-[0.9rem]" key={unidKey}>
       <div className="flex justify-between">
         <label className="block text-sm text-gray-600 mb-1">
           {formatLabel(name)}

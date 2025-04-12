@@ -48,3 +48,5 @@ export const validateEmail = (email) => {
   }
   return "";
 };
+
+export const getUniqueNum = () => Math.random().toString(36).substring(2, 9);

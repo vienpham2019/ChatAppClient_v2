@@ -64,15 +64,17 @@ const EditProfileForm = ({ isOpenMenu, onSetEditMenu }) => {
           <div className="space-y-[0.3rem]">
             {Object.entries(formData).map(([key, data]) => {
               return (
-                <Input
-                  name={key}
-                  value={data}
-                  handleOnChange={handleOnChange}
-                  isShowRequiredPassword={key === "newPassword"}
-                  isForPassword={key.toLocaleLowerCase().includes("password")}
-                  isTextare={key === "aboutMe"}
-                  disabled={key === "email"}
-                />
+                <div key={`${key}-edit profile input`}>
+                  <Input
+                    name={key}
+                    value={data}
+                    handleOnChange={handleOnChange}
+                    isShowRequiredPassword={key === "newPassword"}
+                    isForPassword={key.toLocaleLowerCase().includes("password")}
+                    isTextare={key === "aboutMe"}
+                    disabled={key === "email"}
+                  />
+                </div>
               );
             })}
             <button className="w-full bg-[var(--cl-prim-300)]  py-[0.2rem] rounded">
