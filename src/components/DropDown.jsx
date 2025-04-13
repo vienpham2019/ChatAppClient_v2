@@ -1,14 +1,12 @@
 import { IoIosArrowDown } from "react-icons/io";
-import CollapseYAnimation from "./CollapseYAnimation";
-import { useEffect, useRef, useState } from "react";
 import { getUniqueNum } from "../helper";
-
+import { PopoverBtn, PopoverMenu } from "./PopOver";
 const DropDown = ({
   selected,
   selections,
   onSelect,
-  height = "7rem",
-  width = "7rem",
+  maxHeight = "max-h-[7rem]",
+  minWidth = "min-w-[7rem]",
 }) => {
   const popoverId = getUniqueNum();
 
@@ -16,64 +14,41 @@ const DropDown = ({
     onSelect(value);
     setIsOpen(false);
   };
-  const [isOpen, setIsOpen] = useState(false);
-  const popoverRef = useRef();
-  useEffect(() => {
-    const popover = popoverRef.current;
-
-    const handleToggle = () => {
-      setIsOpen(popover.matches(":popover-open"));
-    };
-
-    popover.addEventListener("toggle", handleToggle);
-
-    return () => {
-      popover.removeEventListener("toggle", handleToggle);
-    };
-  }, []);
 
   return (
     <div
-      className={`cursor-pointer border border-[var(--cl-snd-300)] rounded w-[${width}]`}
+      className={`cursor-pointer border border-[var(--cl-snd-300)] rounded ${minWidth}`}
     >
-      <button
-        style={{ anchorName: `--${popoverId}-button` }}
-        className="flex items-center justify-between p-1 w-full"
-        popoverTarget={popoverId + "dropdown"}
-        anchor={popoverId + "button"}
-        id={popoverId + "button"}
+      <PopoverBtn
+        id={popoverId}
+        className={"flex items-center justify-between p-1 w-full"}
       >
         <span className="text-[0.8rem] overflow-hidden w-[85%] flex items-start">
           {selected}
         </span>
         <IoIosArrowDown />
-      </button>
+      </PopoverBtn>
 
-      <div
-        ref={popoverRef}
-        style={{ positionAnchor: `--${popoverId}-button` }}
-        id={popoverId + "dropdown"}
-        popover="auto"
-        className={`bottom-left z-1 bg-white rounded border border-[var(--cl-snd-200)] min-w-[${width}]`}
+      <PopoverMenu
+        id={popoverId}
+        className={`popover-bottom-left z-1 bg-white rounded border border-[var(--cl-snd-200)] ${minWidth}`}
       >
-        <CollapseYAnimation isOpen={isOpen}>
-          <div
-            className={`grid gap-1 p-1 text-[0.8rem] max-h-[${height}] overflow-y-auto`}
-          >
-            {selections.map((v) => (
-              <span
-                onClick={() => handleSelect(v)}
-                className={`p-1 hover:bg-[var(--cl-snd-200)] ${
-                  selected === v && "bg-[var(--cl-snd-300)]"
-                }`}
-                key={`${v}-${popoverId}`}
-              >
-                {v}
-              </span>
-            ))}
-          </div>
-        </CollapseYAnimation>
-      </div>
+        <div
+          className={`grid gap-1 p-1 text-[0.8rem] ${maxHeight} overflow-y-auto`}
+        >
+          {selections.map((v) => (
+            <span
+              onClick={() => handleSelect(v)}
+              className={`p-1 hover:bg-[var(--cl-snd-200)] ${
+                selected === v && "bg-[var(--cl-snd-300)]"
+              }`}
+              key={`${v}-${popoverId}`}
+            >
+              {v}
+            </span>
+          ))}
+        </div>
+      </PopoverMenu>
     </div>
   );
 };

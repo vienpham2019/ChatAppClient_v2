@@ -70,6 +70,9 @@ const MessagesContainer = () => {
   }));
 
   const handleOnChange = (e) => {};
+
+  return <div></div>;
+
   return (
     <div className="flex flex-col h-screen bg-white flex-1">
       {/* Header */}
