@@ -13,6 +13,7 @@ import { MdOutlineVideocam, MdPhotoSizeSelectActual } from "react-icons/md";
 import { LuPaperclip } from "react-icons/lu";
 import { groupMessages } from "../helper/message";
 import MessageChunk from "./MessageChunk";
+import EmojiPickerMenu from "../components/EmojiPickerMenu";
 const MessagesContainer = () => {
   const [inputMessage, setInputMessage] = useState("");
   const avatarImg = {
@@ -64,14 +65,12 @@ const MessagesContainer = () => {
     },
   ];
 
-  const groupedMessages = groupMessages(messages).map((message) => ({
+  const groupedMessages = groupMessages([messages[0]]).map((message) => ({
     ...message,
     avatarImg: avatarImg[message.sender],
   }));
 
   const handleOnChange = (e) => {};
-
-  return <div></div>;
 
   return (
     <div className="flex flex-col h-screen bg-white flex-1">
@@ -115,6 +114,7 @@ const MessagesContainer = () => {
             </div>
           );
         })}
+        <EmojiPickerMenu />
       </div>
 
       {/* Message Input */}
