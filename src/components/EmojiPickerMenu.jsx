@@ -6,7 +6,12 @@ import { ImFlag } from "react-icons/im";
 import { IoBulb } from "react-icons/io5";
 import { MdOutlineEmojiSymbols } from "react-icons/md";
 import SearchInput from "../components/SearchInput";
+import { PopoverBtn, PopoverMenu } from "./PopOver";
+import { getUniqueNum } from "../helper";
+import Tooltip from "./Tooltip";
+import { useEmojiStore } from "../store/emojiStore";
 const EmojiPickerMenu = ({ onEmojiSelect, onClose }) => {
+  const popoverId = getUniqueNum();
   const [activeCategory, setActiveCategory] = useState("recent");
   const pickerRef = useRef(null);
 
@@ -33,7 +38,6 @@ const EmojiPickerMenu = ({ onEmojiSelect, onClose }) => {
     { id: "objects", name: "Objects", icon: <IoBulb /> },
     { id: "symbols", name: "Symbols", icon: <MdOutlineEmojiSymbols /> },
     { id: "flags", name: "Flags", icon: <ImFlag /> },
-    { id: "custom", name: "Custom", icon: <BsStars /> },
   ];
 
   // Frequently used emojis
@@ -101,6 +105,31 @@ const EmojiPickerMenu = ({ onEmojiSelect, onClose }) => {
     "😴",
   ];
 
+  const [selectedSkinTone, setSelectedSkinTone] = useState("#ffd225");
+
+  const skinTones = {
+    "#ffd225": "Default",
+    "#ffdfbd": "Light",
+    "#e9c197": "Medium Light",
+    "#c88e62": "Medium",
+    "#a86637": "Medium Dark",
+    "#60463a": "Dark",
+  };
+  const getAllCategories = useEmojiStore((state) => state.getAllCategories);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const categories = await getAllCategories();
+        console.log("Fetched:", categories);
+      } catch (err) {
+        console.error("Error:", err.message);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
   return (
     <div
       ref={pickerRef}
@@ -108,12 +137,12 @@ const EmojiPickerMenu = ({ onEmojiSelect, onClose }) => {
       style={{ boxShadow: "0 4px 20px rgba(0,0,0,0.15)" }}
     >
       {/* Category navigation */}
-      <div className="flex items-center justify-between p-2 shadow">
+      <div className="flex items-center justify-evenly shadow">
         {categories.map((category) => (
           <button
             key={category.id}
             onClick={() => setActiveCategory(category.id)}
-            className={`cursor-pointer p-1.5 rounded-md hover:text-[var(--cl-snd-600)] ${
+            className={`relative cursor-pointer px-1.5 py-3 h-full rounded-md hover:text-[var(--cl-snd-600)] ${
               activeCategory === category.id
                 ? "text-[var(--cl-prim-400)]"
                 : "text-[var(--cl-snd-400)]"
@@ -121,6 +150,9 @@ const EmojiPickerMenu = ({ onEmojiSelect, onClose }) => {
             title={category.name}
           >
             <span className="text-xl">{category.icon}</span>
+            {activeCategory === category.id && (
+              <span className="absolute bottom-0 left-0 w-full h-[2px] rounded bg-[var(--cl-prim-300)]"></span>
+            )}
           </button>
         ))}
       </div>
@@ -131,18 +163,48 @@ const EmojiPickerMenu = ({ onEmojiSelect, onClose }) => {
           <SearchInput />
         </div>
         <div className="relative">
-          <button className="cursor-pointer w-4 aspect-square rounded bg-[#e7b98f] shadow-xl"></button>
-          <div className="grid gap-2 absolute right-[50%] translate-x-1/2 bg-black/50 rounded w-[2rem] py-2 justify-center  z-1">
-            <button className="hover:scale-120 cursor-pointer w-4 aspect-square rounded bg-[#e7b98f] shadow-xl"></button>
-          </div>
+          <PopoverBtn id={popoverId}>
+            <span
+              style={{ background: selectedSkinTone }}
+              className="cursor-pointer w-4 aspect-square rounded shadow-xl"
+            ></span>
+          </PopoverBtn>
+          <PopoverMenu
+            id={popoverId}
+            className={
+              "popover-bottom-left -translate-y-[1.7rem] -translate-x-[0.5rem] overflow-visible "
+            }
+          >
+            <div className="grid justify-center items-center gap-2 bg-gray-500 rounded w-[2rem] py-2 z-1">
+              {Object.entries(skinTones).map(([color, label]) => (
+                <Tooltip text={label} dir={"left"}>
+                  <div
+                    className={`${
+                      selectedSkinTone === color &&
+                      "border-[2px] border-gray-200 p-[3px] rounded-md"
+                    } flex items-center justify-center`}
+                  >
+                    <button
+                      onClick={() => setSelectedSkinTone(color)}
+                      key={color}
+                      style={{ background: color }}
+                      className={`${
+                        selectedSkinTone === color && "scale-120"
+                      } hover:scale-120 cursor-pointer rounded w-[1rem] h-[1rem]`}
+                    ></button>
+                  </div>
+                </Tooltip>
+              ))}
+            </div>
+          </PopoverMenu>
         </div>
       </div>
 
       {/* Emoji sections */}
       <div className="overflow-y-auto max-h-[280px] p-2">
         {/* Frequently used section */}
-        <div className="mb-4">
-          <h3 className="text-sm font-medium text-gray-700 mb-2">
+        <div className="mb-4 relative">
+          <h3 className="sticky top-0 border text-sm font-medium text-gray-700 mb-2">
             Frequently used
           </h3>
           <div className="grid grid-cols-8 gap-1">
