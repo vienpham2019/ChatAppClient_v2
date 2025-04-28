@@ -1,11 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Avatar from "../components/Avatar";
-import {
-  FaPhone,
-  FaRegBookmark,
-  FaRegSmileBeam,
-  FaSearch,
-} from "react-icons/fa";
+import { FaRegSmileBeam } from "react-icons/fa";
 import { IoSearch } from "react-icons/io5";
 import { IoMdInformationCircle, IoMdMore, IoMdSend } from "react-icons/io";
 import { PiPhoneCallFill } from "react-icons/pi";
@@ -13,7 +8,7 @@ import { MdOutlineVideocam, MdPhotoSizeSelectActual } from "react-icons/md";
 import { LuPaperclip } from "react-icons/lu";
 import { groupMessages } from "../helper/message";
 import MessageChunk from "./MessageChunk";
-import EmojiPickerMenu from "../components/EmojiPickerMenu";
+import { PopoverMenu } from "../components/PopOver";
 const MessagesContainer = () => {
   const [inputMessage, setInputMessage] = useState("");
   const avatarImg = {
@@ -65,7 +60,7 @@ const MessagesContainer = () => {
     },
   ];
 
-  const groupedMessages = groupMessages([messages[0]]).map((message) => ({
+  const groupedMessages = groupMessages(messages).map((message) => ({
     ...message,
     avatarImg: avatarImg[message.sender],
   }));
@@ -114,7 +109,6 @@ const MessagesContainer = () => {
             </div>
           );
         })}
-        <EmojiPickerMenu />
       </div>
 
       {/* Message Input */}

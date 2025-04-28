@@ -3,60 +3,64 @@ import { FaRegUser } from "react-icons/fa";
 import { FiPhone } from "react-icons/fi";
 import { MdOutlineBlock, MdOutlineMail } from "react-icons/md";
 import { IoLocationOutline, IoSettingsOutline } from "react-icons/io5";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { AiOutlineQuestionCircle } from "react-icons/ai";
+import { PopoverMenu } from "../components/PopOver";
+import CollapseYAnimation from "../components/CollapseYAnimation";
 
 const ProfileMenu = () => {
   const [showEditMenu, setShowEditMenu] = useState(false);
-  const menuRef = useRef();
-  const handleClickOutside = (e) => {
-    if (
-      menuRef.current &&
-      !menuRef.current.contains(e.target) &&
-      !e.target.closest(".more-btn")
-    ) {
-      setShowEditMenu(false);
-    }
-  };
-  useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+
   return (
     <div className="flex flex-col w-full bg-white border-r border-[var(--cl-snd-200)] overflow-y-auto h-screen">
       <div className="flex-1">
         {/* Header with title and menu */}
         <div className="relative flex justify-between h-[10rem]">
-          <div className="flex justify-between w-full z-1 bg-black/50 px-4 py-2">
+          <div className="flex justify-between w-full px-4 py-2 z-[2] bg-white/30">
             <h1 className="text-xl text-white font-medium">My Profile</h1>
-            <button
-              onClick={() => setShowEditMenu(!showEditMenu)}
-              className="more-btn cursor-pointer text-white md:w-auto w-[3rem] text-[2rem] h-[2rem]"
+            <PopoverMenu
+              isOpen={showEditMenu}
+              setIsOpen={setShowEditMenu}
+              positions={["left"]}
+              content={
+                <CollapseYAnimation isOpen={showEditMenu}>
+                  <div className="rounded text-[var(--cl-snd-700)] w-36  bg-white border border-[var(--cl-snd-200)] py-1">
+                    <button className="cursor-pointer w-full px-4 py-2 text-sm text-left flex items-center justify-between hover:bg-gray-50">
+                      Setting
+                      <IoSettingsOutline />
+                    </button>
+                    <button className="cursor-pointer w-full px-4 py-2 text-sm text-left flex items-center justify-between  hover:bg-gray-50">
+                      Block
+                      <MdOutlineBlock />
+                    </button>
+                    <hr className="text-[var(--cl-snd-300)]" />
+                    <button className="cursor-pointer w-full px-4 py-2 text-sm text-left flex items-center justify-between  hover:bg-gray-50">
+                      Help
+                      <AiOutlineQuestionCircle />
+                    </button>
+                  </div>
+                </CollapseYAnimation>
+              }
             >
-              <IoMdMore />
-            </button>
+              <button
+                onClick={() => setShowEditMenu(!showEditMenu)}
+                className="cursor-pointer text-white md:w-auto w-[3rem] text-[2rem] h-[2rem]"
+              >
+                <IoMdMore />
+              </button>
+            </PopoverMenu>
           </div>
-          {showEditMenu && (
-            <div
-              ref={menuRef}
-              className={`absolute rounded text-[var(--cl-snd-700)] right-[1rem] z-20 w-36 top-[2.4rem] bg-white border border-[var(--cl-snd-200)] py-1`}
-            >
-              <button className="cursor-pointer w-full px-4 py-2 text-sm text-left flex items-center justify-between hover:bg-gray-50">
-                Setting
-                <IoSettingsOutline />
-              </button>
-              <button className="cursor-pointer w-full px-4 py-2 text-sm text-left flex items-center justify-between  hover:bg-gray-50">
-                Block
-                <MdOutlineBlock />
-              </button>
-              <hr className="text-[var(--cl-snd-300)]" />
-              <button className="cursor-pointer w-full px-4 py-2 text-sm text-left flex items-center justify-between  hover:bg-gray-50">
-                Help
-                <AiOutlineQuestionCircle />
-              </button>
-            </div>
-          )}
-          <div className="w-full h-[5rem] absolute -bottom-[3rem] z-[1] flex justify-center">
+
+          <div className="absolute inset-0 flex items-center justify-center ">
+            <img
+              src="https://themesdesign.in/chaton/layouts/assets/images/small/img-1.jpg"
+              alt="Social Media Background"
+              width={400}
+              height={160}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="w-full h-[5rem] absolute -bottom-[3rem] z-[4] flex justify-center">
             <div className="relative">
               <img
                 className="w-[5rem] aspect-square rounded-full border-[0.3rem] border-white"
@@ -65,15 +69,6 @@ const ProfileMenu = () => {
               />
               <span className="absolute bottom-[0.2rem] right-0 w-[1.4rem] aspect-square  bg-[var(--cl-success)] rounded-full border-2 border-white"></span>
             </div>
-          </div>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <img
-              src="https://themesdesign.in/chaton/layouts/assets/images/small/img-1.jpg"
-              alt="Social Media Background"
-              width={400}
-              height={160}
-              className="w-full h-full object-cover"
-            />
           </div>
         </div>
 

@@ -6,17 +6,17 @@ import { IoIosSend, IoMdMore } from "react-icons/io";
 import { GoPlus } from "react-icons/go";
 import { IoSearch } from "react-icons/io5";
 import Tooltip from "../components/Tooltip";
+import CollapseYAnimation from "../components/CollapseYAnimation";
+import { PopoverMenu } from "../components/PopOver";
+import ClickOutside from "../components/ClickOutside";
 
 const ContactMenu = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedTerm, setDebouncedTerm] = useState("");
   const [searchAddQuery, setSearchAddQuery] = useState("");
-  const [debouncedAddTerm, setDebouncedAddTerm] = useState("");
-  const [showContactMenu, setShowContactMenu] = useState(null);
-  const [menuPosition, setMenuPosition] = useState("top-[1rem]");
   const [showAddFriendModal, setShowAddFriendModal] = useState(false);
-  const menuRef = useRef(null);
-  const modalRef = useRef(null);
+  const [isOpenContactPopover, setIdOpenContactPopover] = useState();
+
   const contacts = [
     {
       id: "1",
@@ -103,59 +103,6 @@ const ContactMenu = () => {
     }
   }, [debouncedTerm]);
 
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedAddTerm(searchAddQuery);
-    }, 200);
-
-    return () => {
-      clearTimeout(handler); // Cleanup on each keystroke
-    };
-  }, [searchAddQuery]);
-
-  useEffect(() => {
-    if (debouncedAddTerm !== null) {
-      setFilteredAddContacts(
-        contacts.filter((contact) =>
-          contact.name.toLowerCase().includes(debouncedAddTerm.toLowerCase())
-        )
-      );
-    }
-  }, [debouncedAddTerm]);
-
-  const handleClickOutside = (e) => {
-    if (
-      menuRef.current &&
-      !menuRef.current.contains(e.target) &&
-      !e.target.closest(".more-btn")
-    ) {
-      setShowContactMenu(null);
-    } else if (modalRef.current && !modalRef.current.contains(e.target)) {
-      setShowAddFriendModal(false);
-    }
-  };
-  const adjustMenuPosition = (contactId) => {
-    setShowContactMenu(showContactMenu === contactId ? null : contactId);
-    setTimeout(() => {
-      if (menuRef.current) {
-        const menuRect = menuRef.current.getBoundingClientRect();
-        const spaceBelow = window.innerHeight - menuRect.bottom;
-        const spaceAbove = menuRect.top;
-
-        if (spaceBelow < 120 && spaceAbove > 120) {
-          setMenuPosition("bottom-[1rem] rounded-xl rounded-ee-none ");
-        } else {
-          setMenuPosition("top-[1rem] rounded-xl rounded-se-none ");
-        }
-      }
-    }, 0);
-  };
-
-  useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
   const displayContactList = () => {
     if (filteredContacts.length === 0) {
       return displayNoFilterFound();
@@ -178,34 +125,41 @@ const ContactMenu = () => {
                 />
                 <span className="font-medium">{contact.name}</span>
               </div>
-              <button
-                className="more-btn cursor-pointer border border-[var(--cl-snd-200)] rounded p-1"
-                onClick={() => {
-                  adjustMenuPosition(contact.id);
-                }}
-              >
-                <IoMdMore />
-              </button>
 
-              {showContactMenu === contact.id && (
-                <div
-                  ref={menuRef}
-                  className={`absolute h-[120px] text-gray-700 right-[3rem] bg-white ${menuPosition} border border-[var(--cl-snd-200)] shadow py-1 z-10 w-36`}
+              <PopoverMenu
+                isOpen={isOpenContactPopover === contact.id}
+                setIsOpen={setIdOpenContactPopover}
+                positions={["left", "right"]}
+                content={
+                  <CollapseYAnimation
+                    isOpen={isOpenContactPopover === contact.id}
+                  >
+                    <div className="h-[120px] text-gray-700 bg-white border border-[var(--cl-snd-200)] shadow py-1 w-36">
+                      <button className="cursor-pointer w-full px-4 py-2 text-sm text-left flex items-center justify-between hover:bg-gray-50">
+                        Favorite
+                        <MdFavoriteBorder />
+                      </button>
+                      <button className="cursor-pointer w-full px-4 py-2 text-sm text-left flex items-center justify-between  hover:bg-gray-50">
+                        Block
+                        <MdOutlineBlock />
+                      </button>
+                      <button className="cursor-pointer w-full px-4 py-2 text-sm text-left flex items-center justify-between  hover:bg-gray-50">
+                        Remove
+                        <FaRegTrashAlt />
+                      </button>
+                    </div>
+                  </CollapseYAnimation>
+                }
+              >
+                <button
+                  className="cursor-pointer border border-[var(--cl-snd-200)] rounded p-1"
+                  onClick={() => {
+                    setIdOpenContactPopover(contact.id);
+                  }}
                 >
-                  <button className="cursor-pointer w-full px-4 py-2 text-sm text-left flex items-center justify-between hover:bg-gray-50">
-                    Favorite
-                    <MdFavoriteBorder />
-                  </button>
-                  <button className="cursor-pointer w-full px-4 py-2 text-sm text-left flex items-center justify-between  hover:bg-gray-50">
-                    Block
-                    <MdOutlineBlock />
-                  </button>
-                  <button className="cursor-pointer w-full px-4 py-2 text-sm text-left flex items-center justify-between  hover:bg-gray-50">
-                    Remove
-                    <FaRegTrashAlt />
-                  </button>
-                </div>
-              )}
+                  <IoMdMore />
+                </button>
+              </PopoverMenu>
             </div>
           </div>
         ))}
@@ -294,32 +248,34 @@ const ContactMenu = () => {
       {/* Add Friend Modal */}
       {showAddFriendModal && (
         <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
-          <div ref={modalRef} className="bg-white rounded w-full max-w-md">
-            <div className="flex items-center justify-between p-[0.8rem] text-black border-b border-[var(--cl-snd-200)]">
-              <div className=" flex items-center justify-between mb-[0.5rem]">
-                <h2 className="text-gray-700 font-medium flex items-center">
-                  Add New Contacts{" "}
-                </h2>
-              </div>
+          <ClickOutside onClose={() => setShowAddFriendModal(false)}>
+            <div className="bg-white rounded w-full max-w-md">
+              <div className="flex items-center justify-between p-[0.8rem] text-black border-b border-[var(--cl-snd-200)]">
+                <div className=" flex items-center justify-between mb-[0.5rem]">
+                  <h2 className="text-gray-700 font-medium flex items-center">
+                    Add New Contacts{" "}
+                  </h2>
+                </div>
 
-              <button
-                onClick={() => setShowAddFriendModal(false)}
-                className="cursor-pointer border p-[0.2rem] rounded-full border-[var(--cl-snd-500)] text-[var(--cl-snd-500)] hover:border-[var(--cl-snd-1000)] hover:text-[var(--cl-snd-1000)]"
-              >
-                <MdClose />
-              </button>
+                <button
+                  onClick={() => setShowAddFriendModal(false)}
+                  className="cursor-pointer border p-[0.2rem] rounded-full border-[var(--cl-snd-500)] text-[var(--cl-snd-500)] hover:border-[var(--cl-snd-1000)] hover:text-[var(--cl-snd-1000)]"
+                >
+                  <MdClose />
+                </button>
+              </div>
+              <div className="bg-white rounded-lg py-[1rem] mx-4">
+                <input
+                  type="search"
+                  className="block w-full p-[0.7rem] text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 "
+                  placeholder="Search"
+                  value={searchAddQuery}
+                  onChange={(e) => setSearchAddQuery(e.target.value)}
+                />
+                {displayAddContactList()}
+              </div>
             </div>
-            <div className="bg-white rounded-lg py-[1rem] mx-4">
-              <input
-                type="search"
-                className="block w-full p-[0.7rem] text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 "
-                placeholder="Search"
-                value={searchAddQuery}
-                onChange={(e) => setSearchAddQuery(e.target.value)}
-              />
-              {displayAddContactList()}
-            </div>
-          </div>
+          </ClickOutside>
         </div>
       )}
     </div>

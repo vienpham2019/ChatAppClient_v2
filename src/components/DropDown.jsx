@@ -1,6 +1,8 @@
 import { IoIosArrowDown } from "react-icons/io";
+import { PopoverMenu } from "./PopOver";
+import { useState } from "react";
 import { getUniqueNum } from "../helper";
-import { PopoverBtn, PopoverMenu } from "./PopOver";
+import CollapseYAnimation from "./CollapseYAnimation";
 const DropDown = ({
   selected,
   selections,
@@ -8,45 +10,48 @@ const DropDown = ({
   maxHeight = "max-h-[7rem]",
   minWidth = "min-w-[7rem]",
 }) => {
-  const popoverId = getUniqueNum();
-
+  const uniqueId = getUniqueNum();
+  const [isPopOverOpen, setIsPopOverOpen] = useState(false);
   const handleSelect = (value) => {
     onSelect(value);
-    setIsOpen(false);
+    setIsPopOverOpen(false);
   };
 
   return (
     <div
       className={`cursor-pointer border border-[var(--cl-snd-300)] rounded ${minWidth}`}
     >
-      <PopoverBtn
-        id={popoverId}
-        className={"flex items-center justify-between p-1 w-full"}
-      >
-        <span className="text-[0.8rem] overflow-hidden w-[85%] flex items-start">
-          {selected}
-        </span>
-        <IoIosArrowDown />
-      </PopoverBtn>
-
       <PopoverMenu
-        id={popoverId}
-        className={`popover-bottom-left z-1 bg-white rounded border border-[var(--cl-snd-200)] ${minWidth}`}
+        isOpen={isPopOverOpen}
+        setIsOpen={setIsPopOverOpen}
+        content={
+          <CollapseYAnimation isOpen={isPopOverOpen}>
+            <div
+              className={`grid gap-1 p-1 text-[0.8rem] ${maxHeight} overflow-y-auto bg-white ${minWidth} border  border-[var(--cl-snd-200)]`}
+            >
+              {selections.map((v) => (
+                <span
+                  onClick={() => handleSelect(v)}
+                  className={`cursor-pointer p-1 hover:bg-[var(--cl-snd-200)] ${
+                    selected === v && "bg-[var(--cl-snd-300)]"
+                  }`}
+                  key={`${v}-${uniqueId}`}
+                >
+                  {v}
+                </span>
+              ))}
+            </div>
+          </CollapseYAnimation>
+        }
       >
         <div
-          className={`grid gap-1 p-1 text-[0.8rem] ${maxHeight} overflow-y-auto`}
+          className="flex items-center justify-between p-1 w-full"
+          onClick={() => setIsPopOverOpen(true)}
         >
-          {selections.map((v) => (
-            <span
-              onClick={() => handleSelect(v)}
-              className={`p-1 hover:bg-[var(--cl-snd-200)] ${
-                selected === v && "bg-[var(--cl-snd-300)]"
-              }`}
-              key={`${v}-${popoverId}`}
-            >
-              {v}
-            </span>
-          ))}
+          <span className="text-[0.8rem] overflow-hidden w-[85%] flex items-start">
+            {selected}
+          </span>
+          <IoIosArrowDown />
         </div>
       </PopoverMenu>
     </div>

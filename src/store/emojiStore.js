@@ -11,10 +11,33 @@ const initActionState = {
 export const useEmojiStore = create((set) => ({
   ...initActionState,
 
-  getAllCategories: async () => {
+  getByCategories: async (categories) => {
     try {
-      const res = await axiosInstance.get("/emoji/categories");
-      return res.data.metadata.categories;
+      const res = await axiosInstance.post(
+        "/emoji/getByCategories",
+        categories
+      );
+      return res.data.metadata.emojis;
+    } catch (error) {
+      throw new Error(error.response?.data?.message);
+    }
+  },
+
+  searchEmojis: async (searchQuery) => {
+    try {
+      const res = await axiosInstance.get(
+        `/emoji/search?searchQuery=${searchQuery}`
+      );
+      return res.data.metadata.emojis;
+    } catch (error) {
+      throw new Error(error.response?.data?.message);
+    }
+  },
+
+  getAllCategoryCounts: async () => {
+    try {
+      const res = await axiosInstance.get("/emoji/categoryCounts");
+      return res.data.metadata.categoryCounts;
     } catch (error) {
       throw new Error(error.response?.data?.message);
     }

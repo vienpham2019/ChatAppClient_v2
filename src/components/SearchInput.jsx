@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { IoCloseCircle, IoSearch } from "react-icons/io5";
 
-const SearchInput = () => {
+const SearchInput = ({ handleSearch }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
 
@@ -16,8 +16,11 @@ const SearchInput = () => {
 
   useEffect(() => {
     if (debouncedQuery) {
-      console.log("Searching for:", debouncedQuery);
       // Trigger your actual search API here
+      handleSearch(searchQuery);
+    } else {
+      // Search query was cleared
+      handleSearch(""); // Optional: call a handler if defined
     }
   }, [debouncedQuery]);
 
