@@ -11,8 +11,7 @@ const MessageContent = ({
   className = "",
 }) => {
   const [showEditMenu, setShowEditMenu] = useState(false);
-  const [showSubEditMenu, setShowSubEditMenu] = useState(false);
-  const popoverRef = useRef();
+  const [showSubEditMenu, setShowSubEditMenu] = useState([]);
   const formatDate = (isoString) => {
     const date = new Date(isoString);
 
@@ -32,28 +31,23 @@ const MessageContent = ({
   px-[1rem] py-[0.6rem]`}
       >
         <PopoverMenu
-          isOpen={showEditMenu}
-          setIsOpen={setShowEditMenu}
+          isOpen={showSubEditMenu.length >= 1}
+          setIsOpen={() => setShowSubEditMenu(["Main Popover"])}
           onClickOutside={() => {
-            if (!showSubEditMenu) setShowEditMenu(false);
+            if (showSubEditMenu.length === 1) setShowSubEditMenu([]);
           }}
           positions={["top", "bottom"]}
           content={() => (
             <MessagePopover
               isReverse={isReverse}
-              setShowSubEditMenu={(isOpen) => {
-                setShowSubEditMenu(isOpen);
-              }}
-              closeAllPopover={() => {
-                setShowSubEditMenu(false);
-                setShowEditMenu(false);
-              }}
+              showSubEditMenu={showSubEditMenu}
+              setShowSubEditMenu={setShowSubEditMenu}
             />
           )}
         >
           <div
             className="cursor-pointer"
-            onClick={() => setShowEditMenu(!showEditMenu)}
+            onClick={() => setShowSubEditMenu(["Main Popover"])}
           >
             <p>{message}</p>
             {isDisplayTime && (

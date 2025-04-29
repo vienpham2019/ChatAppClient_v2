@@ -1,18 +1,18 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  isSubPopoverOpen: false,
+  showSubEditMenu: false,
 };
 
 const messageSlice = createSlice({
   name: "message",
   initialState,
   reducers: {
-    setIsSubPopoverOpen(state, action) {
-      state.isSubPopoverOpen = action.payload;
+    setShowSubEditMenu(state, action) {
+      state.showSubEditMenu = action.payload;
     },
   },
 });
 
-export const { setIsSubPopoverOpen } = messageSlice.actions;
+export const { setShowSubEditMenu } = messageSlice.actions;
 export default messageSlice.reducer;

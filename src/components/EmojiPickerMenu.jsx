@@ -6,13 +6,12 @@ import { ImFlag } from "react-icons/im";
 import { IoBulb } from "react-icons/io5";
 import { MdOutlineEmojiSymbols } from "react-icons/md";
 import SearchInput from "../components/SearchInput";
-import { PopoverBtn, PopoverMenu } from "./PopOver";
-import { getUniqueNum } from "../helper";
+import { PopoverMenu } from "./PopOver";
 import Tooltip from "./Tooltip";
 import { useEmojiStore } from "../store/emojiStore";
 import { GroupedVirtuoso } from "react-virtuoso";
-const EmojiPickerMenu = ({ onEmojiSelect, onClose }) => {
-  const popoverId = getUniqueNum();
+
+const EmojiPickerMenu = ({ onEmojiSelect, onClose, onOpen }) => {
   const { getByCategories, getAllCategoryCounts, searchEmojis } =
     useEmojiStore();
   const [activeCategory, setActiveCategory] = useState("Recently Used");
@@ -26,21 +25,8 @@ const EmojiPickerMenu = ({ onEmojiSelect, onClose }) => {
   const [preSumGroupCounts, setPreSumGroupCounts] = useState([]);
   const [isSearch, setIsSearch] = useState(false);
 
-  const pickerRef = useRef(null);
   const virtuosoRef = useRef(null);
-  // Close emoji picker when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (pickerRef.current && !pickerRef.current.contains(event.target)) {
-        onClose?.();
-      }
-    }
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [onClose]);
   const categories = [
     { name: "Recently Used", icon: <FaClock /> },
     { name: "Smileys & People", icon: <BsEmojiSmileFill /> },
@@ -175,7 +161,6 @@ const EmojiPickerMenu = ({ onEmojiSelect, onClose }) => {
 
   return (
     <div
-      // ref={pickerRef}
       className="bg-white overflow-hidden rounded-lg shadow-lg w-[350px] border border-gray-200"
       style={{ boxShadow: "0 4px 20px rgba(0,0,0,0.15)" }}
     >
@@ -216,6 +201,10 @@ const EmojiPickerMenu = ({ onEmojiSelect, onClose }) => {
           isOpen={isOpenSkintone}
           setIsOpen={setIsOpenSkintone}
           positions={["bottom", "top"]}
+          onClickOutside={() => {
+            onClose();
+            setIsOpenSkintone(false);
+          }}
           content={() => (
             <div className="grid justify-center items-center gap-2 bg-gray-500 rounded w-[2rem] py-2 z-1">
               {Object.entries(skinTones).map(([color, label], i) => (
@@ -228,7 +217,10 @@ const EmojiPickerMenu = ({ onEmojiSelect, onClose }) => {
                       } flex items-center justify-center`}
                     >
                       <button
-                        onClick={() => !isSearch && setSelectedSkinToneIndex(i)}
+                        onClick={() => {
+                          setIsOpenSkintone(false);
+                          setSelectedSkinToneIndex(i);
+                        }}
                         style={{ background: color }}
                         className={`${
                           selectedSkinToneIndex === i && "scale-120"
@@ -242,7 +234,10 @@ const EmojiPickerMenu = ({ onEmojiSelect, onClose }) => {
           )}
         >
           <div
-            onClick={() => setIsOpenSkintone(!isOpenSkintone)}
+            onClick={() => {
+              isOpenSkintone ? onClose() : onOpen();
+              setIsOpenSkintone(!isOpenSkintone);
+            }}
             style={{
               background: Object.keys(skinTones)[selectedSkinToneIndex],
             }}
@@ -288,7 +283,9 @@ const EmojiPickerMenu = ({ onEmojiSelect, onClose }) => {
                       onMouseEnter={() => setHoverEmoji(emoji)}
                       onMouseLeave={() => setHoverEmoji(null)}
                       className="text-2xl h-[3rem] px-1 hover:bg-gray-100 rounded cursor-pointer"
-                      //   onClick={() => onEmojiSelect(emoji.name)}
+                      onClick={() => {
+                        // onEmojiSelect(emoji.name)
+                      }}
                     >
                       {skin.native}
                     </button>
