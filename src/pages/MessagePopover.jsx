@@ -1,27 +1,17 @@
-import {
-  MdGTranslate,
-  MdOutlineAddReaction,
-  MdOutlineReply,
-} from "react-icons/md";
+import { MdOutlineAddReaction, MdOutlineReply } from "react-icons/md";
 
 import { IoIosMore } from "react-icons/io";
 import Tooltip from "../components/Tooltip";
 import { PopoverMenu } from "../components/PopOver";
 import EmojiPickerMenu from "../components/EmojiPickerMenu";
-import { useState } from "react";
-import { ImReply } from "react-icons/im";
-import { FaCopy, FaRegTrashAlt } from "react-icons/fa";
-import { BsPinFill } from "react-icons/bs";
 import { FaPencil } from "react-icons/fa6";
+import MessageEditMenu from "./MessageEditMenu";
 
 const MessagePopover = ({
   isReverse = false,
   setShowSubEditMenu,
   showSubEditMenu,
 }) => {
-  const [showMoreEmoji, setShowMoreEmoji] = useState(false);
-  const [showEditMenu, setShowEditMenu] = useState(false);
-  const [isSubPopoverOpen, setIsSubPopoverOpen] = useState(false);
   const reactions = [
     { emoji: "👍", label: "Thumbs Up" },
     { emoji: "😄", label: "Smile" },
@@ -51,7 +41,7 @@ const MessagePopover = ({
               setIsOpen={() =>
                 setShowSubEditMenu((prev) => {
                   if (prev.indexOf("More Emoji") === -1) {
-                    return [...prev, "More Emoji"];
+                    return [prev[0], "More Emoji"];
                   }
                 })
               }
@@ -86,9 +76,9 @@ const MessagePopover = ({
                 onClick={() => {
                   setShowSubEditMenu((prev) => {
                     if (prev.indexOf("More Emoji") === -1) {
-                      return [...prev, "More Emoji"];
+                      return [prev[0], "More Emoji"];
                     } else {
-                      return prev.filter((item) => item !== "More Emoji");
+                      return [prev[0]];
                     }
                   });
                 }}
@@ -120,60 +110,32 @@ const MessagePopover = ({
           )}
 
           <PopoverMenu
-            isOpen={showEditMenu}
-            setIsOpen={setShowEditMenu}
+            isOpen={
+              showSubEditMenu.length > 1 && showSubEditMenu[1] === "Edit Menu"
+            }
+            setIsOpen={() =>
+              setShowSubEditMenu((prev) => {
+                if (prev.indexOf("Edit Menu") === -1) {
+                  return [...prev, "Edit Menu"];
+                }
+              })
+            }
             onClickOutside={() => {
-              console.log("click outside from message popover edit");
-              closeAllPopover();
-              setShowEditMenu(false);
+              setShowSubEditMenu([]);
             }}
             positions={["right", "left"]}
-            content={
-              <div className="mx-4 overflow-hidden grid gap-1 text-[var(--cl-snd-600)] shadow-2xs text-[0.8rem] w-[8rem] rounded bg-white border border-[var(--cl-snd-300)]">
-                {!isReverse && (
-                  <span className="px-2 py-1 flex w-full justify-between items-center hover:bg-[var(--cl-snd-300)] ">
-                    Reply
-                    <ImReply />
-                  </span>
-                )}
-                <span className="px-2 py-1 flex w-full justify-between items-center hover:bg-[var(--cl-snd-300)]">
-                  Copy
-                  <FaCopy />
-                </span>
-                <span className="px-2 py-1 flex w-full justify-between items-center hover:bg-[var(--cl-snd-300)]">
-                  Forward
-                  <MdOutlineReply className="text-[1.2rem]" />
-                </span>
-                <hr className="text-gray-300" />
-                <span className="px-2 py-1 flex w-full justify-between items-center hover:bg-[var(--cl-snd-300)]">
-                  Pin
-                  <BsPinFill />
-                </span>
-                <span className="px-2 py-1 flex w-full justify-between items-center hover:bg-[var(--cl-snd-300)]">
-                  Translate
-                  <MdGTranslate />
-                </span>
-                {isReverse && (
-                  <>
-                    <hr className="text-gray-300" />
-                    <span className="px-2 py-1 flex w-full justify-between items-center hover:bg-[var(--cl-snd-300)]">
-                      Edit
-                      <FaPencil />
-                    </span>
-                    <span className="px-2 py-1 flex w-full justify-between items-center hover:bg-[var(--cl-snd-300)]">
-                      Delete
-                      <FaRegTrashAlt />
-                    </span>
-                  </>
-                )}
-              </div>
-            }
+            content={<MessageEditMenu isReverse={isReverse} />}
           >
             <div
               className="cursor-pointer flex items-center"
               onClick={() => {
-                setShowSubEditMenu(!showEditMenu);
-                setShowEditMenu(!showEditMenu);
+                setShowSubEditMenu((prev) => {
+                  if (prev.indexOf("Edit Menu") === -1) {
+                    return [prev[0], "Edit Menu"];
+                  } else {
+                    return [prev[0]];
+                  }
+                });
               }}
             >
               <Tooltip text={"More options"}>
