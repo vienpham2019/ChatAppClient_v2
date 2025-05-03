@@ -10,7 +10,6 @@ const MessageContent = ({
   isReverse = false,
   className = "",
 }) => {
-  const [showEditMenu, setShowEditMenu] = useState(false);
   const [showSubEditMenu, setShowSubEditMenu] = useState([]);
   const formatDate = (isoString) => {
     const date = new Date(isoString);

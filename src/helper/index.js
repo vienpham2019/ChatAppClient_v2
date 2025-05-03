@@ -50,3 +50,5 @@ export const validateEmail = (email) => {
 };
 
 export const getUniqueNum = () => Math.random().toString(36).substring(2, 9);
+
+export const isSubset = (a, b) => a.every((item) => b.includes(item));

@@ -3,31 +3,34 @@ import { BsEmojiSmileFill } from "react-icons/bs";
 import { FaAppleAlt, FaCar, FaClock, FaDog } from "react-icons/fa";
 import { FaVolleyball } from "react-icons/fa6";
 import { ImFlag } from "react-icons/im";
+import { TbMoodEdit } from "react-icons/tb";
 import { IoBulb } from "react-icons/io5";
 import { MdOutlineEmojiSymbols } from "react-icons/md";
 import SearchInput from "../components/SearchInput";
 import { PopoverMenu } from "./PopOver";
 import Tooltip from "./Tooltip";
-import { useEmojiStore } from "../store/emojiStore";
 import { GroupedVirtuoso } from "react-virtuoso";
+import { useSearchEmojis, useGetAllEmojis } from "../store/emojiStore";
 
 const EmojiPickerMenu = ({ onEmojiSelect, onClose, onOpen }) => {
-  const { getByCategories, getAllCategoryCounts, searchEmojis } =
-    useEmojiStore();
+  const { data: emojisRes, isSuccess: isEmojiSuccess } = useGetAllEmojis();
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const { data: searchEmojis } = useSearchEmojis(searchQuery);
+
   const [activeCategory, setActiveCategory] = useState("Recently Used");
   const [selectedSkinToneIndex, setSelectedSkinToneIndex] = useState(0);
   const [hoverEmoji, setHoverEmoji] = useState();
   const [isOpenSkintone, setIsOpenSkintone] = useState(false);
 
-  const [emojis, setEmojis] = useState([]);
-  const [totalGroupCounts, setTotalGroupCounts] = useState([]);
   const [groupCounts, setGroupCounts] = useState([]);
-  const [preSumGroupCounts, setPreSumGroupCounts] = useState([]);
+  const [prevGroupCountSum, setPrevGroupCountSum] = useState([]);
+  const [emojis, setEmojis] = useState([]);
   const [isSearch, setIsSearch] = useState(false);
 
   const virtuosoRef = useRef(null);
 
-  const categories = [
+  const categoriesKey = [
     { name: "Recently Used", icon: <FaClock /> },
     { name: "Smileys & People", icon: <BsEmojiSmileFill /> },
     { name: "Animals & Nature", icon: <FaDog /> },
@@ -38,7 +41,7 @@ const EmojiPickerMenu = ({ onEmojiSelect, onClose, onOpen }) => {
     { name: "Symbols", icon: <MdOutlineEmojiSymbols /> },
     { name: "Flags", icon: <ImFlag /> },
   ];
-  const categoryOrder = categories.map(({ name }) => name);
+  const categoryOrder = categoriesKey.map(({ name }) => name);
 
   const skinTones = {
     "#ffd225": "Default",
@@ -50,30 +53,24 @@ const EmojiPickerMenu = ({ onEmojiSelect, onClose, onOpen }) => {
   };
 
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        await handleFetchEmoji(["Recently Used", "Smileys & People"]);
-        const resCounts = await getAllCategoryCounts();
-        resCounts.sort((a, b) => {
-          return categoryOrder.indexOf(a._id) - categoryOrder.indexOf(b._id);
-        });
-        const initGroupCounts = resCounts.map((c) => Math.ceil(c.count / 8));
-        const initPreSumGroupCounts = [0];
-
-        for (let i = 1; i < initGroupCounts.length; i++) {
-          initPreSumGroupCounts[i] =
-            initPreSumGroupCounts[i - 1] + initGroupCounts[i - 1];
-        }
-
-        setTotalGroupCounts(initGroupCounts);
-        setGroupCounts(initGroupCounts);
-        setPreSumGroupCounts(initPreSumGroupCounts);
-      } catch (err) {
-        console.error("Error:", err.message);
+    if (!isEmojiSuccess) return;
+    const updateEmojis = categoryOrder.map((c) => {
+      if (c === "Recently Used") {
+        return emojisRes[categoryOrder[1]].slice(0, 5);
+      } else {
+        return emojisRes[c];
       }
-    };
-    fetchCategories();
-  }, [setEmojis]);
+    });
+    const updateGroupCounts = updateEmojis.map((e) => Math.ceil(e.length / 8));
+    const updatePrevGroupCountSum = [0];
+    for (let i = 1; i <= updateGroupCounts.length; i++) {
+      updatePrevGroupCountSum[i] =
+        updatePrevGroupCountSum[i - 1] + updateGroupCounts[i - 1];
+    }
+    setPrevGroupCountSum(updatePrevGroupCountSum);
+    setGroupCounts(updateGroupCounts);
+    setEmojis(updateEmojis);
+  }, [isEmojiSuccess]);
 
   const scrollTimeoutRef = useRef(null);
 
@@ -82,77 +79,32 @@ const EmojiPickerMenu = ({ onEmojiSelect, onClose, onOpen }) => {
       index: 0,
       align: "start",
     });
-    if (search === "") {
-      try {
-        await handleFetchEmoji(["Recently Used", "Smileys & People"]);
-        setGroupCounts([...totalGroupCounts]);
-      } catch (err) {
-        console.error("Error:", err.message);
-      }
-    } else {
-      const searchRes = await searchEmojis(search);
-      setGroupCounts([Math.max(1, Math.ceil(searchRes.length / 8))]);
-      setEmojis([searchRes]);
-    }
+    setSearchQuery(search);
     setIsSearch(search !== "");
   };
 
-  const handleFetchEmoji = async (categories) => {
-    const categoriesToFetch = categories.filter(
-      (c) => !emojis[categoryOrder.indexOf(c)]?.length
-    );
-
-    if (categoriesToFetch.length === 0) return;
-    const resEmoji = await getByCategories(categoriesToFetch);
-    // Create a map for quick access
-
-    const updatedEmojis = [];
-    for (let category of categories) {
-      const index = categoryOrder.indexOf(category);
-      updatedEmojis[index] = emojis[index];
-    }
-
-    for (let i = 0; i < categoriesToFetch.length; i++) {
-      const index = categoryOrder.indexOf(categoriesToFetch[i]);
-      updatedEmojis[index] = resEmoji[i];
-    }
-
-    setEmojis(updatedEmojis);
-  };
-
-  const handleRangeChanged = ({ startIndex, endIndex }) => {
+  const handleRangeChanged = ({ startIndex }) => {
     if (isSearch) return;
     // Clear previous timeout if still scrolling
     if (scrollTimeoutRef.current) {
       clearTimeout(scrollTimeoutRef.current);
     }
-
-    // Set a new timeout to run logic after scroll "settles"
+    // // Set a new timeout to run logic after scroll "settles"
     scrollTimeoutRef.current = setTimeout(async () => {
-      for (let i = 0; i < preSumGroupCounts.length; i++) {
-        const start = preSumGroupCounts[i];
+      for (let i = 0; i < prevGroupCountSum.length; i++) {
+        const start = prevGroupCountSum[i];
         const end =
-          i + 1 < preSumGroupCounts.length
-            ? preSumGroupCounts[i + 1]
+          i + 1 < prevGroupCountSum.length
+            ? prevGroupCountSum[i + 1]
             : Number.MAX_SAFE_INTEGER;
 
         if (startIndex >= start && startIndex < end) {
-          const currentCategory = categories[i].name;
+          const currentCategory = categoriesKey[i].name;
 
-          const startGroup = preSumGroupCounts.findLastIndex(
-            (start) => start <= startIndex
-          );
-          const endGroup = preSumGroupCounts.findLastIndex(
-            (start) => start <= endIndex
-          );
-          // Optional: Get the category name
-          const startCategory = categoryOrder[startGroup];
-          const endCategory = categoryOrder[endGroup];
-          const fetchCategories = new Set([startCategory, endCategory]);
-          await handleFetchEmoji([...fetchCategories]);
           if (currentCategory !== activeCategory) {
             setActiveCategory(currentCategory);
           }
+
           break;
         }
       }
@@ -166,12 +118,12 @@ const EmojiPickerMenu = ({ onEmojiSelect, onClose, onOpen }) => {
     >
       {/* Category navigation */}
       <div className="flex items-center justify-evenly shadow">
-        {categories.map((category, i) => (
+        {categoriesKey.map((category, i) => (
           <button
             key={category.name + "-Icon"}
             onClick={async () => {
               virtuosoRef.current?.scrollToIndex({
-                index: preSumGroupCounts[i],
+                index: prevGroupCountSum[i],
                 align: "start",
                 behavior: "smooth",
               });
@@ -196,54 +148,11 @@ const EmojiPickerMenu = ({ onEmojiSelect, onClose, onOpen }) => {
         <div className="flex-1">
           <SearchInput handleSearch={handleSearch} />
         </div>
-
-        <PopoverMenu
-          isOpen={isOpenSkintone}
-          setIsOpen={setIsOpenSkintone}
-          positions={["bottom", "top"]}
-          onClickOutside={() => {
-            onClose();
-            setIsOpenSkintone(false);
-          }}
-          content={() => (
-            <div className="grid justify-center items-center gap-2 bg-gray-500 rounded w-[2rem] py-2 z-1">
-              {Object.entries(skinTones).map(([color, label], i) => (
-                <div key={"skin tone " + i}>
-                  <Tooltip text={label} dir={"left"}>
-                    <div
-                      className={`${
-                        selectedSkinToneIndex === i &&
-                        "border-[2px] border-gray-200 p-[3px] rounded-md"
-                      } flex items-center justify-center`}
-                    >
-                      <button
-                        onClick={() => {
-                          setIsOpenSkintone(false);
-                          setSelectedSkinToneIndex(i);
-                        }}
-                        style={{ background: color }}
-                        className={`${
-                          selectedSkinToneIndex === i && "scale-120"
-                        } hover:scale-120 cursor-pointer rounded w-[1rem] h-[1rem]`}
-                      ></button>
-                    </div>
-                  </Tooltip>
-                </div>
-              ))}
-            </div>
-          )}
-        >
-          <div
-            onClick={() => {
-              isOpenSkintone ? onClose() : onOpen();
-              setIsOpenSkintone(!isOpenSkintone);
-            }}
-            style={{
-              background: Object.keys(skinTones)[selectedSkinToneIndex],
-            }}
-            className="cursor-pointer w-4 aspect-square rounded shadow-xl"
-          />
-        </PopoverMenu>
+        <div>
+          <Tooltip text={"Custom Default Reactions"} dir={"left"}>
+            <TbMoodEdit className="text-[1.4rem] cursor-pointer text-[var(--cl-snd-600)] hover:text-[var(--cl-prim-500)]" />
+          </Tooltip>
+        </div>
       </div>
 
       {/* Emoji sections */}
@@ -257,13 +166,13 @@ const EmojiPickerMenu = ({ onEmojiSelect, onClose, onOpen }) => {
           groupContent={(index) => {
             return (
               <h3 className="top-0 p-2 text-sm font-medium text-[var(--cl-snd-800)] bg-white/90">
-                {isSearch ? "Search Result" : categories[index].name}
+                {isSearch ? "Search Result" : categoriesKey[index].name}
               </h3>
             );
           }}
           itemContent={(itemIndex, groupIndex) => {
-            let currentRow = itemIndex - preSumGroupCounts[groupIndex];
             const displayEmoji = () => {
+              const currentRow = itemIndex - prevGroupCountSum[groupIndex];
               if (!emojis[groupIndex]?.length) {
                 if (isSearch) {
                   return <div className="h-[3rem] flex-1">No result found</div>;
@@ -272,11 +181,13 @@ const EmojiPickerMenu = ({ onEmojiSelect, onClose, onOpen }) => {
                   <div className="h-[3rem] flex-1 animate-pulse bg-[var(--cl-snd-200)]"></div>
                 );
               }
+
               return emojis[groupIndex]
                 .slice(currentRow * 8, currentRow * 8 + 8)
                 .map((emoji, index) => {
                   const skin =
                     emoji.skins[selectedSkinToneIndex] || emoji.skins[0];
+
                   return (
                     <button
                       key={"emoji" + itemIndex + "-" + index}
@@ -317,6 +228,53 @@ const EmojiPickerMenu = ({ onEmojiSelect, onClose, onOpen }) => {
             </div>
           </div>
         )}
+        <PopoverMenu
+          isOpen={isOpenSkintone}
+          setIsOpen={setIsOpenSkintone}
+          positions={["top", "bottom"]}
+          onClickOutside={() => {
+            onClose();
+            setIsOpenSkintone(false);
+          }}
+          content={() => (
+            <div className="translate-y-[1.5rem] grid justify-center items-center gap-2 bg-gray-500 rounded w-[2rem] py-2 z-1">
+              {Object.entries(skinTones).map(([color, label], i) => (
+                <div key={"skin tone " + i}>
+                  <Tooltip text={label} dir={"left"}>
+                    <div
+                      className={`${
+                        selectedSkinToneIndex === i &&
+                        "border-[2px] border-gray-200 p-[3px] rounded-md"
+                      } flex items-center justify-center`}
+                    >
+                      <button
+                        onClick={() => {
+                          setIsOpenSkintone(false);
+                          setSelectedSkinToneIndex(i);
+                        }}
+                        style={{ background: color }}
+                        className={`${
+                          selectedSkinToneIndex === i && "scale-120"
+                        } hover:scale-120 cursor-pointer rounded w-[1rem] h-[1rem]`}
+                      ></button>
+                    </div>
+                  </Tooltip>
+                </div>
+              ))}
+            </div>
+          )}
+        >
+          <div
+            onClick={() => {
+              isOpenSkintone ? onClose() : onOpen();
+              setIsOpenSkintone(!isOpenSkintone);
+            }}
+            style={{
+              background: Object.keys(skinTones)[selectedSkinToneIndex],
+            }}
+            className="cursor-pointer w-4 aspect-square rounded shadow-xl"
+          />
+        </PopoverMenu>
       </div>
     </div>
   );
