@@ -11,24 +11,51 @@ import { PopoverMenu } from "./PopOver";
 import Tooltip from "./Tooltip";
 import { GroupedVirtuoso } from "react-virtuoso";
 import { useSearchEmojis, useGetAllEmojis } from "../store/emojiStore";
+import { useDispatch } from "react-redux";
+import { modalEnum, setShowModal } from "../store/modalSlice";
 
-const EmojiPickerMenu = ({ onEmojiSelect, onClose, onOpen }) => {
-  const { data: emojisRes, isSuccess: isEmojiSuccess } = useGetAllEmojis();
-
+const EmojiPickerMenu = ({
+  onEmojiSelect,
+  onClose = () => {},
+  positions = ["right", "left"],
+  showCustomModal = true,
+  containerClassName = "",
+  isOpen = false,
+  setIsOpen = () => {},
+  children,
+}) => {
+  const menuRef = useRef();
+  const skinRef = useRef();
+  const dispatch = useDispatch();
+  const { data: emojisRes } = useGetAllEmojis();
   const [searchQuery, setSearchQuery] = useState("");
-  const { data: searchEmojis } = useSearchEmojis(searchQuery);
+  const { data: searchEmojis, isSuccess: searchEmojiSuccess } =
+    useSearchEmojis(searchQuery);
 
   const [activeCategory, setActiveCategory] = useState("Recently Used");
   const [selectedSkinToneIndex, setSelectedSkinToneIndex] = useState(0);
   const [hoverEmoji, setHoverEmoji] = useState();
   const [isOpenSkintone, setIsOpenSkintone] = useState(false);
 
-  const [groupCounts, setGroupCounts] = useState([]);
+  const [groupCounts, setGroupCounts] = useState([1, 10]);
   const [prevGroupCountSum, setPrevGroupCountSum] = useState([]);
   const [emojis, setEmojis] = useState([]);
   const [isSearch, setIsSearch] = useState(false);
 
   const virtuosoRef = useRef(null);
+  const handleClickOutside = (e) => {
+    if (
+      menuRef.current &&
+      !menuRef.current.contains(e.target) &&
+      (!skinRef.current || !skinRef.current.contains(e.target))
+    ) {
+      onClose();
+    }
+  };
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const categoriesKey = [
     { name: "Recently Used", icon: <FaClock /> },
@@ -53,24 +80,41 @@ const EmojiPickerMenu = ({ onEmojiSelect, onClose, onOpen }) => {
   };
 
   useEffect(() => {
-    if (!isEmojiSuccess) return;
+    if (!emojisRes) return;
+
+    if (isSearch) {
+      if (!searchEmojiSuccess) return;
+      if (!searchEmojis?.length) {
+        setEmojis([]);
+        setGroupCounts([1]);
+      } else {
+        const count = Math.ceil(searchEmojis.length / 8);
+        setEmojis([searchEmojis]);
+        setGroupCounts([count]);
+      }
+      return;
+    }
+
+    // Handle non-search mode
     const updateEmojis = categoryOrder.map((c) => {
       if (c === "Recently Used") {
-        return emojisRes[categoryOrder[1]].slice(0, 5);
-      } else {
-        return emojisRes[c];
+        return emojisRes[categoryOrder[1]]?.slice(0, 5) || [];
       }
+      return emojisRes[c] || [];
     });
+
     const updateGroupCounts = updateEmojis.map((e) => Math.ceil(e.length / 8));
+
     const updatePrevGroupCountSum = [0];
     for (let i = 1; i <= updateGroupCounts.length; i++) {
       updatePrevGroupCountSum[i] =
         updatePrevGroupCountSum[i - 1] + updateGroupCounts[i - 1];
     }
+
     setPrevGroupCountSum(updatePrevGroupCountSum);
     setGroupCounts(updateGroupCounts);
     setEmojis(updateEmojis);
-  }, [isEmojiSuccess]);
+  }, [emojisRes, isSearch, searchEmojis]);
 
   const scrollTimeoutRef = useRef(null);
 
@@ -112,171 +156,195 @@ const EmojiPickerMenu = ({ onEmojiSelect, onClose, onOpen }) => {
   };
 
   return (
-    <div
-      className="bg-white overflow-hidden rounded-lg shadow-lg w-[350px] border border-gray-200"
-      style={{ boxShadow: "0 4px 20px rgba(0,0,0,0.15)" }}
-    >
-      {/* Category navigation */}
-      <div className="flex items-center justify-evenly shadow">
-        {categoriesKey.map((category, i) => (
-          <button
-            key={category.name + "-Icon"}
-            onClick={async () => {
-              virtuosoRef.current?.scrollToIndex({
-                index: prevGroupCountSum[i],
-                align: "start",
-                behavior: "smooth",
-              });
-            }}
-            className={`relative cursor-pointer px-1.5 py-3 h-full rounded-md hover:text-[var(--cl-snd-600)] ${
-              activeCategory === category.name
-                ? "text-[var(--cl-prim-400)]"
-                : "text-[var(--cl-snd-400)]"
-            }`}
-            title={category.name}
-          >
-            <span className="text-xl">{category.icon}</span>
-            {activeCategory === category.name && (
-              <span className="absolute bottom-0 left-0 w-full h-[2px] rounded bg-[var(--cl-prim-300)]"></span>
-            )}
-          </button>
-        ))}
-      </div>
-
-      {/* Search bar */}
-      <div className="p-2 flex items-center gap-2">
-        <div className="flex-1">
-          <SearchInput handleSearch={handleSearch} />
-        </div>
-        <div>
-          <Tooltip text={"Custom Default Reactions"} dir={"left"}>
-            <TbMoodEdit className="text-[1.4rem] cursor-pointer text-[var(--cl-snd-600)] hover:text-[var(--cl-prim-500)]" />
-          </Tooltip>
-        </div>
-      </div>
-
-      {/* Emoji sections */}
-      <div className="overflow-y-auto h-[280px] px-2">
-        <GroupedVirtuoso
-          className="overflow-y-auto"
-          ref={virtuosoRef}
-          style={{ height: "100%" }}
-          groupCounts={groupCounts}
-          rangeChanged={handleRangeChanged}
-          groupContent={(index) => {
-            return (
-              <h3 className="top-0 p-2 text-sm font-medium text-[var(--cl-snd-800)] bg-white/90">
-                {isSearch ? "Search Result" : categoriesKey[index].name}
-              </h3>
-            );
-          }}
-          itemContent={(itemIndex, groupIndex) => {
-            const displayEmoji = () => {
-              const currentRow = itemIndex - prevGroupCountSum[groupIndex];
-              if (!emojis[groupIndex]?.length) {
-                if (isSearch) {
-                  return <div className="h-[3rem] flex-1">No result found</div>;
-                }
-                return (
-                  <div className="h-[3rem] flex-1 animate-pulse bg-[var(--cl-snd-200)]"></div>
-                );
-              }
-
-              return emojis[groupIndex]
-                .slice(currentRow * 8, currentRow * 8 + 8)
-                .map((emoji, index) => {
-                  const skin =
-                    emoji.skins[selectedSkinToneIndex] || emoji.skins[0];
-
-                  return (
-                    <button
-                      key={"emoji" + itemIndex + "-" + index}
-                      onMouseEnter={() => setHoverEmoji(emoji)}
-                      onMouseLeave={() => setHoverEmoji(null)}
-                      className="text-2xl h-[3rem] px-1 hover:bg-gray-100 rounded cursor-pointer"
-                      onClick={() => {
-                        // onEmojiSelect(emoji.name)
-                      }}
-                    >
-                      {skin.native}
-                    </button>
-                  );
-                });
-            };
-
-            return <div className="flex gap-[7px] px-1">{displayEmoji()}</div>;
-          }}
-        />
-      </div>
-      {/* Footer */}
-      <div className="p-2 flex justify-between items-center text-gray-500 text-sm border-t border-[var(--cl-snd-200)]">
-        {!hoverEmoji ? (
-          <div className="flex items-center">
-            <span className="text-[2rem] mr-2">👆</span>
-            <span className="text-gray-400">Pick an emoji...</span>
-          </div>
-        ) : (
-          <div className="flex items-center">
-            <span className="text-[2rem] mr-2">
-              {hoverEmoji.skins[selectedSkinToneIndex]
-                ? hoverEmoji.skins[selectedSkinToneIndex].native
-                : hoverEmoji.skins[0].native}
-            </span>
-            <div className="grid gap-1">
-              <span className="text-gray-400">{hoverEmoji.name}</span>
-              <span>{hoverEmoji.emoticons.join(" ")}</span>
-            </div>
-          </div>
-        )}
-        <PopoverMenu
-          isOpen={isOpenSkintone}
-          setIsOpen={setIsOpenSkintone}
-          positions={["top", "bottom"]}
-          onClickOutside={() => {
-            onClose();
-            setIsOpenSkintone(false);
-          }}
-          content={() => (
-            <div className="translate-y-[1.5rem] grid justify-center items-center gap-2 bg-gray-500 rounded w-[2rem] py-2 z-1">
-              {Object.entries(skinTones).map(([color, label], i) => (
-                <div key={"skin tone " + i}>
-                  <Tooltip text={label} dir={"left"}>
-                    <div
-                      className={`${
-                        selectedSkinToneIndex === i &&
-                        "border-[2px] border-gray-200 p-[3px] rounded-md"
-                      } flex items-center justify-center`}
-                    >
-                      <button
-                        onClick={() => {
-                          setIsOpenSkintone(false);
-                          setSelectedSkinToneIndex(i);
-                        }}
-                        style={{ background: color }}
-                        className={`${
-                          selectedSkinToneIndex === i && "scale-120"
-                        } hover:scale-120 cursor-pointer rounded w-[1rem] h-[1rem]`}
-                      ></button>
-                    </div>
-                  </Tooltip>
-                </div>
-              ))}
-            </div>
-          )}
+    <PopoverMenu
+      isOpen={isOpen}
+      setIsOpen={setIsOpen}
+      positions={positions}
+      clickOutsideCapture={false}
+      containerClassName={containerClassName}
+      content={
+        <div
+          ref={menuRef}
+          className="bg-white overflow-hidden rounded-lg shadow-lg w-[350px] border border-gray-200"
+          style={{ boxShadow: "0 4px 20px rgba(0,0,0,0.15)" }}
         >
-          <div
-            onClick={() => {
-              isOpenSkintone ? onClose() : onOpen();
-              setIsOpenSkintone(!isOpenSkintone);
-            }}
-            style={{
-              background: Object.keys(skinTones)[selectedSkinToneIndex],
-            }}
-            className="cursor-pointer w-4 aspect-square rounded shadow-xl"
-          />
-        </PopoverMenu>
-      </div>
-    </div>
+          {/* Category navigation */}
+          <div className="flex items-center justify-evenly shadow">
+            {categoriesKey.map((category, i) => (
+              <button
+                key={category.name + "-Icon"}
+                onClick={async () => {
+                  virtuosoRef.current?.scrollToIndex({
+                    index: prevGroupCountSum[i],
+                    align: "start",
+                    behavior: "smooth",
+                  });
+                }}
+                className={`relative cursor-pointer px-1.5 py-3 h-full rounded-md hover:text-[var(--cl-snd-600)] ${
+                  activeCategory === category.name
+                    ? "text-[var(--cl-prim-400)]"
+                    : "text-[var(--cl-snd-400)]"
+                }`}
+                title={category.name}
+              >
+                <span className="text-xl">{category.icon}</span>
+                {activeCategory === category.name && (
+                  <span className="absolute bottom-0 left-0 w-full h-[2px] rounded bg-[var(--cl-prim-300)]"></span>
+                )}
+              </button>
+            ))}
+          </div>
+
+          {/* Search bar */}
+          <div className="p-2 flex items-center gap-2">
+            <div className="flex-1">
+              <SearchInput handleSearch={handleSearch} />
+            </div>
+            {showCustomModal && (
+              <div
+                onClick={() =>
+                  dispatch(setShowModal(modalEnum.CustomEmojiModal))
+                }
+              >
+                <Tooltip text={"Custom Default Reactions"} dir={"left"}>
+                  <TbMoodEdit className="text-[1.4rem] cursor-pointer text-[var(--cl-snd-600)] hover:text-[var(--cl-prim-500)]" />
+                </Tooltip>
+              </div>
+            )}
+          </div>
+
+          {/* Emoji sections */}
+          <div className="overflow-y-auto h-[280px] px-2">
+            <GroupedVirtuoso
+              className="overflow-y-auto"
+              ref={virtuosoRef}
+              style={{ height: "100%" }}
+              groupCounts={groupCounts}
+              rangeChanged={handleRangeChanged}
+              groupContent={(index) => {
+                return (
+                  <h3 className="top-0 p-2 text-sm font-medium text-[var(--cl-snd-800)] bg-white/90">
+                    {isSearch ? "Search Result" : categoriesKey[index].name}
+                  </h3>
+                );
+              }}
+              itemContent={(itemIndex, groupIndex) => {
+                const displayEmoji = () => {
+                  const currentRow = itemIndex - prevGroupCountSum[groupIndex];
+                  if (!emojis[groupIndex]?.length) {
+                    if (isSearch) {
+                      return (
+                        <div className="h-[3rem] flex-1">No result found</div>
+                      );
+                    }
+                    return (
+                      <div className="h-[3rem] flex-1 animate-pulse bg-[var(--cl-snd-200)]"></div>
+                    );
+                  }
+
+                  return emojis[groupIndex]
+                    .slice(currentRow * 8, currentRow * 8 + 8)
+                    .map((emoji, index) => {
+                      const skin =
+                        emoji.skins[selectedSkinToneIndex] || emoji.skins[0];
+
+                      return (
+                        <button
+                          key={"emoji" + itemIndex + "-" + index}
+                          onMouseEnter={() => setHoverEmoji(emoji)}
+                          onMouseLeave={() => setHoverEmoji(null)}
+                          className="text-2xl h-[3rem] px-1 hover:bg-gray-100 rounded cursor-pointer"
+                          onClick={() => {
+                            // onEmojiSelect(emoji.name)
+                          }}
+                        >
+                          {skin.native}
+                        </button>
+                      );
+                    });
+                };
+
+                return (
+                  <div className="flex gap-[7px] px-1">{displayEmoji()}</div>
+                );
+              }}
+            />
+          </div>
+          {/* Footer */}
+          <div className="p-2 flex justify-between items-center text-gray-500 text-sm border-t border-[var(--cl-snd-200)]">
+            {!hoverEmoji ? (
+              <div className="flex items-center">
+                <span className="text-[2rem] mr-2">👆</span>
+                <span className="text-gray-400">Pick an emoji...</span>
+              </div>
+            ) : (
+              <div className="flex items-center">
+                <span className="text-[2rem] mr-2">
+                  {hoverEmoji.skins[selectedSkinToneIndex]
+                    ? hoverEmoji.skins[selectedSkinToneIndex].native
+                    : hoverEmoji.skins[0].native}
+                </span>
+                <div className="grid gap-1">
+                  <span className="text-gray-400">{hoverEmoji.name}</span>
+                  <span>{hoverEmoji.emoticons.join(" ")}</span>
+                </div>
+              </div>
+            )}
+            <PopoverMenu
+              isOpen={isOpenSkintone}
+              setIsOpen={(val) => {
+                setIsOpenSkintone(val);
+              }}
+              positions={["top", "bottom"]}
+              containerClassName="z-[20]"
+              clickOutsideCapture={false}
+              content={() => (
+                <div
+                  ref={skinRef}
+                  className="translate-y-[1.5rem] grid justify-center items-center gap-2 bg-gray-500 rounded w-[2rem] py-2 z-1"
+                >
+                  {Object.entries(skinTones).map(([color, label], i) => (
+                    <div key={"skin tone " + i}>
+                      <Tooltip text={label} dir={"left"}>
+                        <div
+                          className={`${
+                            selectedSkinToneIndex === i &&
+                            "border-[2px] border-gray-200 p-[3px] rounded-md"
+                          } flex items-center justify-center`}
+                        >
+                          <button
+                            onClick={() => {
+                              setIsOpenSkintone(false);
+                              setSelectedSkinToneIndex(i);
+                            }}
+                            style={{ background: color }}
+                            className={`${
+                              selectedSkinToneIndex === i && "scale-120"
+                            } hover:scale-120 cursor-pointer rounded w-[1rem] h-[1rem]`}
+                          ></button>
+                        </div>
+                      </Tooltip>
+                    </div>
+                  ))}
+                </div>
+              )}
+            >
+              <div
+                onClick={() => {
+                  setIsOpenSkintone(!isOpenSkintone);
+                }}
+                style={{
+                  background: Object.keys(skinTones)[selectedSkinToneIndex],
+                }}
+                className="mr-2 cursor-pointer w-4 aspect-square rounded shadow-xl"
+              />
+            </PopoverMenu>
+          </div>
+        </div>
+      }
+    >
+      {children}
+    </PopoverMenu>
   );
 };
 

@@ -33,44 +33,11 @@ const MessagePopover = ({
             </div>
           ))}
           <div className="cursor-pointer flex items-center pr-[0.5rem] border-r border-[var(--cl-snd-300)]">
-            <PopoverMenu
-              isOpen={
-                showSubEditMenu.length > 1 &&
-                showSubEditMenu[1] === "More Emoji"
-              }
-              setIsOpen={() =>
-                setShowSubEditMenu((prev) => {
-                  if (prev.indexOf("More Emoji") === -1) {
-                    return [prev[0], "More Emoji"];
-                  }
-                })
-              }
-              onClickOutside={() => {
-                if (showSubEditMenu.indexOf("Emoji Picker") !== -1) {
-                  setShowSubEditMenu((prev) =>
-                    prev.filter((item) => item !== "Emoji Picker")
-                  );
-                } else {
-                  setShowSubEditMenu([]);
-                }
+            <EmojiPickerMenu
+              isOpen={showSubEditMenu.indexOf("More Emoji") !== -1}
+              onClose={() => {
+                setShowSubEditMenu([]);
               }}
-              positions={["right", "left"]}
-              content={
-                <EmojiPickerMenu
-                  onClose={() => {
-                    setShowSubEditMenu((prev) =>
-                      prev.filter((item) => item !== "Emoji Picker")
-                    );
-                  }}
-                  onOpen={() => {
-                    setShowSubEditMenu((prev) => {
-                      if (prev.indexOf("Emoji Picker") === -1) {
-                        return [...prev, "Emoji Picker"];
-                      }
-                    });
-                  }}
-                />
-              }
             >
               <div
                 onClick={() => {
@@ -89,7 +56,7 @@ const MessagePopover = ({
                   </span>
                 </Tooltip>
               </div>
-            </PopoverMenu>
+            </EmojiPickerMenu>
           </div>
           {isReverse ? (
             <div className="cursor-pointer flex items-center">

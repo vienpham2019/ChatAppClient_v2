@@ -9,6 +9,7 @@ import { LuPaperclip } from "react-icons/lu";
 import { groupMessages } from "../helper/message";
 import MessageChunk from "./MessageChunk";
 import { PopoverMenu } from "../components/PopOver";
+import CustomEmojiModal from "../components/CustomEmojiModal";
 const MessagesContainer = () => {
   const [inputMessage, setInputMessage] = useState("");
   const avatarImg = {
@@ -69,6 +70,7 @@ const MessagesContainer = () => {
 
   return (
     <div className="flex flex-col h-screen bg-white flex-1">
+      <CustomEmojiModal isOpen={true} />
       {/* Header */}
       <div className="flex items-center justify-between p-4  border-[var(--cl-snd-200)] bg-black/5">
         <div className="flex items-center gap-3">
