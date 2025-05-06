@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { IoIosCloseCircle, IoIosCloseCircleOutline } from "react-icons/io";
 import { IoCloseCircle, IoSearch } from "react-icons/io5";
 
 const SearchInput = ({ handleSearch }) => {
@@ -30,12 +31,20 @@ const SearchInput = ({ handleSearch }) => {
         <IoSearch />
       </div>
       <input
-        type="search"
-        className="w-full pl-10 pr-3 py-1.5 rounded-md border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+        type="text"
+        className="w-full pl-10 pr-[1.6rem] py-1.5 rounded-md border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
         placeholder="Search"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
       />
+      {searchQuery !== "" && (
+        <div
+          onClick={() => setSearchQuery("")}
+          className="absolute cursor-pointer inset-y-0 right-2 flex items-center text-[var(--cl-snd-500)]"
+        >
+          <IoIosCloseCircle />
+        </div>
+      )}
     </div>
   );
 };
