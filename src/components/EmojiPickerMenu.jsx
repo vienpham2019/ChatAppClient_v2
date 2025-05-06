@@ -16,16 +16,26 @@ import { modalEnum, setShowModal } from "../store/modalSlice";
 
 const EmojiPickerMenu = ({
   onEmojiSelect,
-  onClose = () => {},
   positions = ["right", "left"],
   showCustomModal = true,
   containerClassName = "",
   isOpen = false,
-  setIsOpen = () => {},
   children,
+  menuRef,
+  skinRef,
 }) => {
-  const menuRef = useRef();
-  const skinRef = useRef();
+  const handleClickOutside = (e) => {
+    if (skinRef.current && !skinRef.current.contains(e.target)) {
+      setIsOpenSkintone(false); // close modal/menu if click is outside all tracked areas
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
   const dispatch = useDispatch();
   const { data: emojisRes } = useGetAllEmojis();
   const [searchQuery, setSearchQuery] = useState("");
@@ -43,19 +53,6 @@ const EmojiPickerMenu = ({
   const [isSearch, setIsSearch] = useState(false);
 
   const virtuosoRef = useRef(null);
-  const handleClickOutside = (e) => {
-    if (
-      menuRef.current &&
-      !menuRef.current.contains(e.target) &&
-      (!skinRef.current || !skinRef.current.contains(e.target))
-    ) {
-      onClose();
-    }
-  };
-  useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
 
   const categoriesKey = [
     { name: "Recently Used", icon: <FaClock /> },
@@ -158,7 +155,6 @@ const EmojiPickerMenu = ({
   return (
     <PopoverMenu
       isOpen={isOpen}
-      setIsOpen={setIsOpen}
       positions={positions}
       clickOutsideCapture={false}
       containerClassName={containerClassName}
@@ -205,6 +201,7 @@ const EmojiPickerMenu = ({
                 onClick={() =>
                   dispatch(setShowModal(modalEnum.CustomEmojiModal))
                 }
+                className="emoji-btn"
               >
                 <Tooltip text={"Custom Default Reactions"} dir={"left"}>
                   <TbMoodEdit className="text-[1.4rem] cursor-pointer text-[var(--cl-snd-600)] hover:text-[var(--cl-prim-500)]" />

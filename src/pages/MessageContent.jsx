@@ -32,13 +32,12 @@ const MessageContent = ({
         <PopoverMenu
           isOpen={showSubEditMenu.length >= 1}
           setIsOpen={() => setShowSubEditMenu(["Main Popover"])}
-          onClickOutside={() => {
-            if (showSubEditMenu.length === 1) setShowSubEditMenu([]);
-          }}
+          clickOutsideCapture={false}
           positions={["top", "bottom"]}
           content={() => (
             <MessagePopover
               isReverse={isReverse}
+              onClose={() => setShowSubEditMenu([])}
               showSubEditMenu={showSubEditMenu}
               setShowSubEditMenu={setShowSubEditMenu}
             />

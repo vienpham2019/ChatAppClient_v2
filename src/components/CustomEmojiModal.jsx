@@ -9,6 +9,9 @@ import { modalEnum, setShowModal } from "../store/modalSlice";
 
 const CustomEmojiModal = () => {
   const dispatch = useDispatch();
+  const emojiMenuRef = useRef();
+  const emojiSkinRef = useRef();
+
   const { showModal } = useSelector((state) => state.modal);
   const [isSave, setIsSave] = useState(false);
   const [selectEmoji, setSelectEmoji] = useState();
@@ -24,26 +27,29 @@ const CustomEmojiModal = () => {
   const menuRef = useRef();
 
   const handleClickOutside = (e) => {
-    if (menuRef.current && !menuRef.current.contains(e.target)) {
+    if (
+      !menuRef?.current.contains(e.target) &&
+      !emojiMenuRef?.current?.contains(e.target) &&
+      !emojiSkinRef?.current?.contains(e.target)
+    ) {
       dispatch(setShowModal(null));
     }
   };
 
   useEffect(() => {
-    if (showMenuOrder.length === 0) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
+    document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [showMenuOrder]);
+  }, []);
 
   const displayEmoji = (reaction, index) => {
     return (
       <EmojiPickerMenu
         isOpen={showMenuOrder.indexOf(`Emoji Menu - ${index}`) !== -1}
-        onClose={() => setShowMenuOrder([])}
         positions={["bottom", "top"]}
         showCustomModal={false}
         containerClassName="z-20"
+        menuRef={emojiMenuRef}
+        skinRef={emojiSkinRef}
       >
         <div
           onMouseEnter={() => {

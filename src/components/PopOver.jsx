@@ -6,7 +6,7 @@ export const PopoverMenu = ({
   positions = ["bottom", "top"],
   padding = 1,
   reposition = true,
-  onClickOutside = () => setIsOpen(false),
+  onClickOutside = () => clickOutsideCapture && setIsOpen(false),
   content,
   children,
   containerClassName = "",

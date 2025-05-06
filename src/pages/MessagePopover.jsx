@@ -6,20 +6,38 @@ import { PopoverMenu } from "../components/PopOver";
 import EmojiPickerMenu from "../components/EmojiPickerMenu";
 import { FaPencil } from "react-icons/fa6";
 import MessageEditMenu from "./MessageEditMenu";
+import { useEffect, useRef, useState } from "react";
 
-const MessagePopover = ({
-  isReverse = false,
-  setShowSubEditMenu,
-  showSubEditMenu,
-}) => {
+const MessagePopover = ({ isReverse = false, onClose }) => {
   const reactions = [
     { emoji: "👍", label: "Thumbs Up" },
     { emoji: "😄", label: "Smile" },
     { emoji: "❤️", label: "Red Heart" },
     { emoji: "😲", label: "Surprised" },
   ];
+  const menuRef = useRef();
+  const emojiMenuRef = useRef();
+  const emojiSkinRef = useRef();
+  const editMenuRef = useRef();
+  const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
+  const [isEditMenuOpen, setIsEditMenuOpen] = useState(false);
+  const handleClickOutside = (e) => {
+    if (
+      !menuRef?.current.contains(e.target) &&
+      !emojiMenuRef?.current?.contains(e.target) &&
+      !emojiSkinRef?.current?.contains(e.target) &&
+      !editMenuRef?.current?.contains(e.target)
+    ) {
+      onClose(); // close modal/menu if click is outside all tracked areas
+    }
+  };
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
-    <div className="bg-white my-3">
+    <div ref={menuRef} className="bg-white my-3">
       <div className="grid gap-1">
         <div className="border border-[var(--cl-snd-300)] relative flex gap-[0.7rem] px-[0.7rem] py-[0.5rem] rounded items-center">
           {reactions.map(({ emoji, label }) => (
@@ -34,20 +52,16 @@ const MessagePopover = ({
           ))}
           <div className="cursor-pointer flex items-center pr-[0.5rem] border-r border-[var(--cl-snd-300)]">
             <EmojiPickerMenu
-              isOpen={showSubEditMenu.indexOf("More Emoji") !== -1}
-              onClose={() => {
-                setShowSubEditMenu([]);
-              }}
+              isOpen={isEmojiPickerOpen}
+              menuRef={emojiMenuRef}
+              skinRef={emojiSkinRef}
             >
               <div
+                className="emoji-btn"
                 onClick={() => {
-                  setShowSubEditMenu((prev) => {
-                    if (prev.indexOf("More Emoji") === -1) {
-                      return [prev[0], "More Emoji"];
-                    } else {
-                      return [prev[0]];
-                    }
-                  });
+                  console.log("EmojiPickerMenu click");
+                  setIsEditMenuOpen(false);
+                  setIsEmojiPickerOpen(!isEmojiPickerOpen);
                 }}
               >
                 <Tooltip text={"More reactions"}>
@@ -77,32 +91,18 @@ const MessagePopover = ({
           )}
 
           <PopoverMenu
-            isOpen={
-              showSubEditMenu.length > 1 && showSubEditMenu[1] === "Edit Menu"
-            }
-            setIsOpen={() =>
-              setShowSubEditMenu((prev) => {
-                if (prev.indexOf("Edit Menu") === -1) {
-                  return [...prev, "Edit Menu"];
-                }
-              })
-            }
-            onClickOutside={() => {
-              setShowSubEditMenu([]);
-            }}
+            isOpen={isEditMenuOpen}
+            clickOutsideCapture={false}
             positions={["right", "left"]}
-            content={<MessageEditMenu isReverse={isReverse} />}
+            content={
+              <MessageEditMenu isReverse={isReverse} menuRef={editMenuRef} />
+            }
           >
             <div
-              className="cursor-pointer flex items-center"
+              className="cursor-pointer flex items-center edit-btn"
               onClick={() => {
-                setShowSubEditMenu((prev) => {
-                  if (prev.indexOf("Edit Menu") === -1) {
-                    return [prev[0], "Edit Menu"];
-                  } else {
-                    return [prev[0]];
-                  }
-                });
+                setIsEmojiPickerOpen(false);
+                setIsEditMenuOpen(!isEditMenuOpen);
               }}
             >
               <Tooltip text={"More options"}>
