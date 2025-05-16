@@ -1,72 +1,76 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Avatar from "../components/Avatar";
-import { FaRegSmileBeam } from "react-icons/fa";
 import { IoSearch } from "react-icons/io5";
-import { IoMdInformationCircle, IoMdMore, IoMdSend } from "react-icons/io";
+import { IoMdInformationCircle, IoMdMore } from "react-icons/io";
 import { PiPhoneCallFill } from "react-icons/pi";
-import { MdOutlineVideocam, MdPhotoSizeSelectActual } from "react-icons/md";
-import { LuPaperclip } from "react-icons/lu";
+import { MdOutlineVideocam } from "react-icons/md";
 import { groupMessages } from "../helper/message";
 import MessageChunk from "./MessageChunk";
-import { PopoverMenu } from "../components/PopOver";
 import CustomEmojiModal from "../components/CustomEmojiModal";
+import EmojiPickerMenu from "../components/EmojiPickerMenu";
+import Tooltip from "../components/Tooltip";
+import { VscSend } from "react-icons/vsc";
+import { BsEmojiSmile } from "react-icons/bs";
+import { HiOutlinePaperClip } from "react-icons/hi2";
+import MessageReply from "./MessageReply";
+import { useSelector } from "react-redux";
+import MessageContent from "./MessageContent";
+import { getTime } from "../helper";
+
 const MessagesContainer = () => {
   const [inputMessage, setInputMessage] = useState("");
-  const avatarImg = {
-    Alice: "https://i.pravatar.cc/150?img=1",
-    Bob: "https://i.pravatar.cc/150?img=4",
-    You: "https://i.pravatar.cc/150?img=9",
+  const [isEmojiOpen, setIsEmojiOpen] = useState(false);
+  const emojiMenuRef = useRef();
+  const emojiSkinRef = useRef();
+
+  const handleClickOutside = (e) => {
+    if (
+      !emojiMenuRef?.current?.contains(e.target) &&
+      !emojiSkinRef?.current?.contains(e.target)
+    ) {
+      setIsEmojiOpen(false);
+    }
   };
-  const messages = [
-    {
-      sender: "Alice",
-      message: "Hey! Are we still on for the meeting today?",
-      timestamp: "2025-04-11T09:15:00Z",
-    },
-    {
-      sender: "Alice",
-      message: "Just finished the report.",
-      timestamp: "2025-04-11T09:15:00Z",
-    },
-    {
-      sender: "Alice",
-      message: "Ok",
-      timestamp: "2025-04-11T09:15:00Z",
-    },
 
-    {
-      sender: "You",
-      message: "Yes, let's start at 10 AM.",
-      timestamp: "2025-04-11T09:16:25Z",
-    },
-    {
-      sender: "You",
-      message: "Yes, let's start at 10 AM.",
-      timestamp: "2025-04-11T09:16:25Z",
-    },
-    {
-      sender: "Alice",
-      message: "Perfect. See you then!",
-      timestamp: "2025-04-11T09:17:40Z",
-    },
-    {
-      sender: "Bob",
-      message: "Hey team, just joined the chat.",
-      timestamp: "2025-04-11T09:18:10Z",
-    },
-    {
-      sender: "You",
-      message: "Welcome Bob!",
-      timestamp: "2025-04-11T09:18:45Z",
-    },
-  ];
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
-  const groupedMessages = groupMessages(messages).map((message) => ({
-    ...message,
-    avatarImg: avatarImg[message.sender],
-  }));
+  const { messages, users } = useSelector((state) => state.message);
 
   const handleOnChange = (e) => {};
+
+  const getIsDisplayForMessage = (index) => {
+    const current = messages[index];
+    const previous = messages[index - 1];
+    const next = messages[index + 1];
+
+    const isDisplay = {
+      avatar: true,
+      time: true,
+      name: true,
+    };
+
+    // If previous message is from the same user, hide avatar and name
+    if (
+      previous?.userId === current.userId &&
+      getTime(previous.timestamp) === getTime(current.timestamp)
+    ) {
+      isDisplay.avatar = false;
+      isDisplay.name = false;
+    }
+
+    // If next message is from the same user and close in time, hide time
+    if (
+      next?.userId === current.userId &&
+      getTime(next.timestamp) === getTime(current.timestamp)
+    ) {
+      isDisplay.time = false;
+    }
+
+    return isDisplay;
+  };
 
   return (
     <div className="flex flex-col h-screen bg-white flex-1">
@@ -74,7 +78,7 @@ const MessagesContainer = () => {
       {/* Header */}
       <div className="flex items-center justify-between p-4  border-[var(--cl-snd-200)] bg-black/5">
         <div className="flex items-center gap-3">
-          <Avatar imgUrl={"https://i.pravatar.cc/150?img=1"} isOnline={true} />
+          <Avatar imgUrl={users[0].profilePictureUrl} isOnline={true} />
           <div>
             <h1 className="font-semibold text-gray-800">Victoria Lane</h1>
             <p className="text-sm text-gray-500">Online</p>
@@ -100,42 +104,62 @@ const MessagesContainer = () => {
       </div>
 
       {/* Chat Messages */}
-      <div className="flex-1 overflow-y-auto p-[2rem] space-y-6 grid items-end">
-        {groupedMessages.map((messages, i) => {
-          return (
-            <div key={`Message Container - ${i}`}>
-              <MessageChunk
-                groupedMessage={messages}
-                isReverse={messages.sender === "You"}
-              />
-            </div>
-          );
-        })}
+      <div className="flex-1 overflow-y-auto p-[2rem] space-y-1 grid items-end">
+        {messages.map((message, index) => (
+          <div key={`messsage-${index}`}>
+            <MessageContent
+              message={message}
+              isDisplay={getIsDisplayForMessage(index)}
+            />
+          </div>
+        ))}
       </div>
 
       {/* Message Input */}
       <div className="border-t border-[var(--cl-snd-200)] p-3">
         <div className="grid gap-1 px-[2rem]">
-          <div className="flex items-center gap-[2rem]">
-            <input
+          <div className="grid gap-[0.2rem] rounded border border-[var(--cl-snd-200)] p-2">
+            {/* reply message */}
+            <MessageReply message={messages[5]} isCloseBtn={true} />
+            {/* reply message */}
+            <textarea
               onChange={handleOnChange}
               type="text"
               value={inputMessage}
               placeholder="Enter Message..."
-              className="px-[1rem] rounded w-full bg-[var(--cl-prim-100)] py-[0.7rem]"
+              className="px-[1rem] w-full py-[0.7rem] resize-none focus:outline-0"
             />
-            <button className="text-[var(--cl-prim-500)] w-[1rem] aspect-square">
-              <FaRegSmileBeam />
-            </button>
-            <button className="text-[var(--cl-prim-500)] w-[1rem] aspect-square">
-              <LuPaperclip />
-            </button>
-            <button className="text-[var(--cl-prim-500)] w-[1rem] aspect-square rounded">
-              <MdPhotoSizeSelectActual />
-            </button>
-            <button className="flex items-center justify-center  text-[1.2rem] bg-[var(--cl-prim-400)] text-white h-[2.5rem] aspect-square rounded">
-              <IoMdSend />
-            </button>
+            <div className="flex w-full justify-end gap-[0.8rem] items-center">
+              <EmojiPickerMenu
+                isOpen={isEmojiOpen}
+                positions={["top", "bottom"]}
+                showCustomModal={false}
+                menuRef={emojiMenuRef}
+                skinRef={emojiSkinRef}
+              >
+                <button onClick={() => setIsEmojiOpen(!isEmojiOpen)}>
+                  <Tooltip text={"More reactions"}>
+                    <BsEmojiSmile
+                      className={`text-[1.3rem] ${
+                        isEmojiOpen
+                          ? "text-[var(--cl-prim-600)]"
+                          : "text-[var(--cl-snd-600)] "
+                      } cursor-pointer hover:text-[var(--cl-prim-600)]`}
+                    />
+                  </Tooltip>
+                </button>
+              </EmojiPickerMenu>
+              <button className="border-r pr-2 border-[var(--cl-snd-300)]">
+                <Tooltip text={"Attach file"}>
+                  <HiOutlinePaperClip className="text-[1.3rem] cursor-pointer text-[var(--cl-snd-600)]  hover:text-[var(--cl-prim-600)]" />
+                </Tooltip>
+              </button>
+              <button>
+                <Tooltip text={"Send"}>
+                  <VscSend className="text-[1.3rem] cursor-pointer text-[var(--cl-snd-600)]  hover:text-[var(--cl-prim-600)]" />
+                </Tooltip>
+              </button>
+            </div>
           </div>
           <div className="text-xs text-gray-500 mt-1 ml-2 flex items-center gap-[0.5rem]">
             <span>Victoria Lane is typing</span>

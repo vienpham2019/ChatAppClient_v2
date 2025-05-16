@@ -7,8 +7,11 @@ import EmojiPickerMenu from "../components/EmojiPickerMenu";
 import { FaPencil } from "react-icons/fa6";
 import MessageEditMenu from "./MessageEditMenu";
 import { useEffect, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
+import { setEditMessageId } from "../store/messageSlice";
 
-const MessagePopover = ({ isReverse = false, onClose }) => {
+const MessagePopover = ({ id, isReverse = false, onClose }) => {
+  const dispatch = useDispatch();
   const reactions = [
     { emoji: "👍", label: "Thumbs Up" },
     { emoji: "😄", label: "Smile" },
@@ -59,7 +62,6 @@ const MessagePopover = ({ isReverse = false, onClose }) => {
               <div
                 className="emoji-btn"
                 onClick={() => {
-                  console.log("EmojiPickerMenu click");
                   setIsEditMenuOpen(false);
                   setIsEmojiPickerOpen(!isEmojiPickerOpen);
                 }}
@@ -75,7 +77,13 @@ const MessagePopover = ({ isReverse = false, onClose }) => {
           {isReverse ? (
             <div className="cursor-pointer flex items-center">
               <Tooltip text={"Edit"}>
-                <span className="text-[1rem] text-[var(--cl-snd-600)]">
+                <span
+                  onClick={() => {
+                    onClose();
+                    dispatch(setEditMessageId(id));
+                  }}
+                  className="text-[1rem] text-[var(--cl-snd-600)]"
+                >
                   <FaPencil />
                 </span>
               </Tooltip>
@@ -95,7 +103,12 @@ const MessagePopover = ({ isReverse = false, onClose }) => {
             clickOutsideCapture={false}
             positions={["right", "left"]}
             content={
-              <MessageEditMenu isReverse={isReverse} menuRef={editMenuRef} />
+              <MessageEditMenu
+                onClose={onClose}
+                isReverse={isReverse}
+                menuRef={editMenuRef}
+                id={id}
+              />
             }
           >
             <div

@@ -15,7 +15,7 @@ const CustomEmojiModal = () => {
   const { showModal } = useSelector((state) => state.modal);
   const [isSave, setIsSave] = useState(false);
   const [selectEmoji, setSelectEmoji] = useState();
-  const [showMenuOrder, setShowMenuOrder] = useState([]);
+  const [showEmojiPickerIndex, setEmojiPickerIndex] = useState(-1);
   const reactions = [
     { emoji: "👍", label: "Thumbs Up" },
     { emoji: "😄", label: "Smile" },
@@ -28,10 +28,11 @@ const CustomEmojiModal = () => {
 
   const handleClickOutside = (e) => {
     if (
-      !menuRef?.current.contains(e.target) &&
+      !menuRef?.current?.contains(e.target) &&
       !emojiMenuRef?.current?.contains(e.target) &&
       !emojiSkinRef?.current?.contains(e.target)
     ) {
+      setEmojiPickerIndex(-1);
       dispatch(setShowModal(null));
     }
   };
@@ -44,7 +45,7 @@ const CustomEmojiModal = () => {
   const displayEmoji = (reaction, index) => {
     return (
       <EmojiPickerMenu
-        isOpen={showMenuOrder.indexOf(`Emoji Menu - ${index}`) !== -1}
+        isOpen={showEmojiPickerIndex === index}
         positions={["bottom", "top"]}
         showCustomModal={false}
         containerClassName="z-20"
@@ -59,11 +60,7 @@ const CustomEmojiModal = () => {
             setSelectEmoji(null);
           }}
           onClick={() => {
-            if (showMenuOrder.indexOf(`Emoji Menu - ${index}`) === -1) {
-              setShowMenuOrder(() => {
-                return [`Emoji Menu - ${index}`];
-              });
-            }
+            setEmojiPickerIndex((prev) => (prev === index ? -1 : index));
           }}
           className="relative cursor-pointer hover:bg-[var(--cl-snd-50)] w-[2.7rem] aspect-square flex items-center justify-center rounded border border-[var(--cl-snd-300)]"
         >
@@ -103,7 +100,10 @@ const CustomEmojiModal = () => {
         </div>
         <div className="flex justify-end gap-4 text-[0.9rem] mt-[2rem]">
           <button
-            onClick={() => dispatch(setShowModal(null))}
+            onClick={() => {
+              setEmojiPickerIndex(-1);
+              dispatch(setShowModal(null));
+            }}
             className="cursor-pointer hover:bg-gray-100 border border-[var(--cl-snd-500)] w-[6rem] p-2 rounded-lg"
           >
             Cancel

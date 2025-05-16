@@ -1,42 +1,145 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import MessagePopover from "./MessagePopover";
 import { PopoverMenu } from "../components/PopOver";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { RxCross1 } from "react-icons/rx";
+import { IoMdCheckmark } from "react-icons/io";
+import { BsEmojiSmile } from "react-icons/bs";
+import EmojiPickerMenu from "../components/EmojiPickerMenu";
+import { setEditMessageId } from "../store/messageSlice";
+import { FaRegTrashAlt } from "react-icons/fa";
+import Tooltip from "../components/Tooltip";
+import { getTime } from "../helper";
+import Avatar from "../components/Avatar";
 
 const MessageContent = ({
   message,
-  timestamp,
-  isDisplayTime = true,
-  isReverse = false,
+  isDisplay = { avatar: true, time: true, name: true },
   className = "",
 }) => {
+  const dispatch = useDispatch();
+  const { editMessageId, users } = useSelector((state) => state.message);
   const [showSubEditMenu, setShowSubEditMenu] = useState([]);
-  const formatDate = (isoString) => {
-    const date = new Date(isoString);
+  const [editMessageVal, setEditMessageVal] = useState(message.message);
+  const [isMyMessage, setIsMyMessage] = useState(false);
+  const [user, setUser] = useState();
+  const [isEmojiOpen, setIsEmojiOpen] = useState(false);
+  const emojiMenuRef = useRef();
+  const emojiSkinRef = useRef();
 
-    return date.toLocaleTimeString([], {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
+  useEffect(() => {
+    users.forEach((u) => {
+      if (u.userId === message.userId) {
+        setUser(u);
+        return;
+      }
     });
+    setIsMyMessage(message.userId === "user1");
+  }, [message]);
+
+  const handleClickOutside = (e) => {
+    if (
+      !emojiMenuRef?.current?.contains(e.target) &&
+      !emojiSkinRef?.current?.contains(e.target)
+    ) {
+      setIsEmojiOpen(false);
+    }
   };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  if (editMessageId === message.id) {
+    return (
+      <div className="grid items-center group border border-[var(--cl-snd-200)] rounded  w-[40vw]">
+        <textarea
+          onChange={(e) => setEditMessageVal(e.target.value)}
+          type="text"
+          value={editMessageVal}
+          className="focus:outline-0 p-2 "
+        />
+        <div className="flex justify-end items-center pb-1 px-2 gap-3 w-full border-b-2 border-[var(--cl-prim-400)]">
+          <EmojiPickerMenu
+            isOpen={isEmojiOpen}
+            positions={["bottom", "top"]}
+            showCustomModal={false}
+            menuRef={emojiMenuRef}
+            skinRef={emojiSkinRef}
+          >
+            <div>
+              <Tooltip text={"More reactions"}>
+                <BsEmojiSmile
+                  onClick={() => setIsEmojiOpen(!isEmojiOpen)}
+                  className={`text-[1.3rem] ${
+                    isEmojiOpen
+                      ? "text-[var(--cl-prim-600)]"
+                      : "text-[var(--cl-snd-600)] "
+                  } cursor-pointer hover:text-[var(--cl-prim-600)]`}
+                />
+              </Tooltip>
+            </div>
+          </EmojiPickerMenu>
+          <Tooltip text={"Cancel"}>
+            <RxCross1
+              onClick={() => dispatch(setEditMessageId(null))}
+              className="cursor-pointer text-[var(--cl-snd-600)]  hover:text-[var(--cl-prim-600)]"
+            />
+          </Tooltip>
+
+          <Tooltip text={"Done"}>
+            <IoMdCheckmark className="text-[1.3rem] text-[var(--cl-snd-600)] cursor-pointer hover:text-[var(--cl-prim-600)]" />
+          </Tooltip>
+          <Tooltip text={"Delete"}>
+            <FaRegTrashAlt className="text-[1.1rem] text-[var(--cl-snd-600)] cursor-pointer hover:text-[var(--cl-prim-600)]" />
+          </Tooltip>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
-      className={`flex ${isReverse && "flex-row-reverse"} items-center group`}
+      className={`flex ${isMyMessage && "flex-row-reverse"} ${
+        isDisplay?.name && "mt-[2rem]"
+      } items-top group`}
     >
+      {!isMyMessage && (
+        <div className="w-[2.3rem] mr-[0.5rem] motion-safe:r-2">
+          {isDisplay?.avatar && (
+            <Avatar
+              imgUrl={
+                user?.profilePictureUrl || "https://i.pravatar.cc/150?img=1"
+              }
+              isOnline={true}
+            />
+          )}
+        </div>
+      )}
+
       <div
-        className={`relative mb-[1.4rem] bg-[var(--cl-snd-200)] text-[0.9em] text-[var(--cl-snd-800)] rounded-2xl ${className} 
+        className={`relative ${
+          message?.reactions.length !== 0 && "mb-[1.4rem]"
+        }  bg-[var(--cl-snd-200)] text-[0.9em] text-[var(--cl-snd-800)] rounded-2xl ${
+          !isDisplay?.time && !isMyMessage && "rounded-bl-sm"
+        }  
+         ${!isDisplay?.avatar && !isMyMessage && "rounded-tl-sm"}  
+         ${!isDisplay?.time && isMyMessage && "rounded-br-sm"}  
+         ${!isDisplay?.avatar && isMyMessage && "rounded-tr-sm"}  
   px-[1rem] py-[0.6rem]`}
       >
+        {!isMyMessage && isDisplay?.name && (
+          <span className="absolute -top-[1.2rem] text-[0.8rem] w-[50vw] text-[var(--cl-snd-400)]">
+            {user?.name || ""}
+          </span>
+        )}
         <PopoverMenu
           isOpen={showSubEditMenu.length >= 1}
-          setIsOpen={() => setShowSubEditMenu(["Main Popover"])}
           clickOutsideCapture={false}
           positions={["top", "bottom"]}
           content={() => (
             <MessagePopover
-              isReverse={isReverse}
               onClose={() => setShowSubEditMenu([])}
               showSubEditMenu={showSubEditMenu}
               setShowSubEditMenu={setShowSubEditMenu}
@@ -47,33 +150,35 @@ const MessageContent = ({
             className="cursor-pointer"
             onClick={() => setShowSubEditMenu(["Main Popover"])}
           >
-            <p>{message}</p>
-            {isDisplayTime && (
+            <p>{message.message}</p>
+            {isDisplay?.time && (
               <span
                 className={`mt-[0.4rem] text-xs text-[var(--cl-snd-600)] w-full flex ${
-                  !isReverse && "justify-end"
+                  !isMyMessage && "justify-end"
                 }`}
               >
-                {formatDate(timestamp)}
+                {getTime(message.timestamp)}
               </span>
             )}
           </div>
         </PopoverMenu>
-        <div
-          className={`absolute -bottom-[1.6rem] ${
-            isReverse ? "right-0" : "left-0"
-          }`}
-        >
-          <div className="bg-[var(--cl-snd-200)] py-[0.2rem] px-[0.4rem] rounded-full border-[0.2rem] border-white flex items-end justify-center gap-1">
-            <span>&#128513;</span>
-            <span> &#x1F494;</span>
-            <span> &#x1F494;</span>
-            <span> &#x1F494;</span>
-            <span> &#x1F494;</span>
-            <span>...</span>
-            <small className="mr-1">10</small>
+        {message.reactions.length > 0 && (
+          <div
+            className={`absolute -bottom-[1.6rem] ${
+              isMyMessage ? "right-0" : "left-0"
+            }`}
+          >
+            <div className="bg-[var(--cl-snd-200)] py-[0.2rem] px-[0.4rem] rounded-full border-[0.2rem] border-white flex items-end justify-center gap-1">
+              {message.reactions.slice(0, 5).map(({ emoji }, i) => (
+                <span key={`messsage-${message.id}-reaction-${i}`}>
+                  {emoji}
+                </span>
+              ))}
+              {message.reactions.length > 5 && <span>...</span>}
+              <small className="mr-1">{message.reactions.length}</small>
+            </div>
           </div>
-        </div>
+        )}{" "}
       </div>
     </div>
   );

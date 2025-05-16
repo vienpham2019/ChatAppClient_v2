@@ -3,8 +3,11 @@ import { FaCopy, FaRegTrashAlt } from "react-icons/fa";
 import { FaPencil } from "react-icons/fa6";
 import { ImReply } from "react-icons/im";
 import { MdGTranslate, MdOutlineReply } from "react-icons/md";
+import { setEditMessageId } from "../store/messageSlice";
+import { useDispatch } from "react-redux";
 
-const MessageEditMenu = ({ isReverse, menuRef }) => {
+const MessageEditMenu = ({ isReverse, menuRef, id, onClose }) => {
+  const dispatch = useDispatch();
   return (
     <div
       ref={menuRef}
@@ -36,7 +39,13 @@ const MessageEditMenu = ({ isReverse, menuRef }) => {
       {isReverse && (
         <>
           <hr className="text-gray-300" />
-          <span className="cursor-pointer px-2 py-1 flex w-full justify-between items-center hover:bg-[var(--cl-snd-300)]">
+          <span
+            onClick={() => {
+              onClose();
+              dispatch(setEditMessageId(id));
+            }}
+            className="cursor-pointer px-2 py-1 flex w-full justify-between items-center hover:bg-[var(--cl-snd-300)]"
+          >
             Edit
             <FaPencil />
           </span>

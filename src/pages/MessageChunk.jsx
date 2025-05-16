@@ -2,7 +2,7 @@ import Avatar from "../components/Avatar";
 import { getUniqueNum } from "../helper";
 import MessageContent from "./MessageContent";
 
-const MessageChunk = ({ groupedMessage, isReverse = false }) => {
+const MessageChunk = ({ id, groupedMessage, isReverse = false }) => {
   const getGroupMessageClass = (index) => {
     const length = groupedMessage.messages.length;
     if (length === 1) return "";
@@ -21,9 +21,11 @@ const MessageChunk = ({ groupedMessage, isReverse = false }) => {
       <div
         className={`flex gap-[1rem] w-[70%] ${isReverse && "flex-row-reverse"}`}
       >
-        <div className="w-[2.3rem]">
-          <Avatar imgUrl={groupedMessage.avatarImg} isOnline={true} />
-        </div>
+        {!isReverse && (
+          <div className="w-[2.3rem]">
+            <Avatar imgUrl={groupedMessage.avatarImg} isOnline={true} />
+          </div>
+        )}
 
         <div className="grid gap-[0.2rem] relative">
           {groupedMessage.sender !== "You" && (
@@ -34,6 +36,7 @@ const MessageChunk = ({ groupedMessage, isReverse = false }) => {
           {groupedMessage.messages.map((message, i) => (
             <div key={getUniqueNum()}>
               <MessageContent
+                id={`${id}-${i}`}
                 message={message}
                 timestamp={groupedMessage.timestamp}
                 isDisplayTime={groupedMessage.messages.length - 1 === i}

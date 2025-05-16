@@ -52,3 +52,19 @@ export const validateEmail = (email) => {
 export const getUniqueNum = () => Math.random().toString(36).substring(2, 9);
 
 export const isSubset = (a, b) => a.every((item) => b.includes(item));
+
+export const getTime = (isoString) => {
+  const date = new Date(isoString);
+
+  return date.toLocaleTimeString([], {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+};
+
+export const getDate = (isoString) => {
+  const date = new Date(isoString);
+
+  return date.toLocaleDateString("en-US"); // returns "4/28/2025"
+};
