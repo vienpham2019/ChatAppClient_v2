@@ -11,31 +11,24 @@ import { FaRegTrashAlt } from "react-icons/fa";
 import Tooltip from "../components/Tooltip";
 import { getTime } from "../helper";
 import Avatar from "../components/Avatar";
+import MessageReply from "./MessageReply";
+import { useGetUserProfile } from "../store/userStore";
+import { useGetMessageById } from "../store/messageStore";
 
-const MessageContent = ({
-  message,
-  isDisplay = { avatar: true, time: true, name: true },
-  className = "",
-}) => {
+const MessageContent = ({ message }) => {
   const dispatch = useDispatch();
-  const { editMessageId, users } = useSelector((state) => state.message);
+  const { editMessageId } = useSelector((state) => state.message);
   const [showSubEditMenu, setShowSubEditMenu] = useState([]);
   const [editMessageVal, setEditMessageVal] = useState(message.message);
-  const [isMyMessage, setIsMyMessage] = useState(false);
-  const [user, setUser] = useState();
+  const isMyMessage = message.userId === "user1";
   const [isEmojiOpen, setIsEmojiOpen] = useState(false);
   const emojiMenuRef = useRef();
   const emojiSkinRef = useRef();
 
-  useEffect(() => {
-    users.forEach((u) => {
-      if (u.userId === message.userId) {
-        setUser(u);
-        return;
-      }
-    });
-    setIsMyMessage(message.userId === "user1");
-  }, [message]);
+  const { data: replyMessage } = useGetMessageById(message?.replyTo);
+  const { data: user, isLoading: userLoading } = useGetUserProfile(
+    message.userId
+  );
 
   const handleClickOutside = (e) => {
     if (
@@ -50,6 +43,17 @@ const MessageContent = ({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  if (userLoading)
+    return (
+      <div class="max-w-sm animate-pulse h-[4rem] flex gap-2 mb-[3rem]">
+        <div class=" bg-gray-200 rounded-full dark:bg-gray-700 w-[3rem] h-[3rem]"></div>
+        <div className="gird items-center">
+          <div class="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-[4rem] mb-4"></div>
+          <div class="h-[2rem] bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
+        </div>
+      </div>
+    );
 
   if (editMessageId === message.id) {
     return (
@@ -102,12 +106,12 @@ const MessageContent = ({
   return (
     <div
       className={`flex ${isMyMessage && "flex-row-reverse"} ${
-        isDisplay?.name && "mt-[2rem]"
+        !message?.isGroupedWithPrev && "mt-[2rem]"
       } items-top group`}
     >
       {!isMyMessage && (
         <div className="w-[2.3rem] mr-[0.5rem] motion-safe:r-2">
-          {isDisplay?.avatar && (
+          {!message?.isGroupedWithPrev && (
             <Avatar
               imgUrl={
                 user?.profilePictureUrl || "https://i.pravatar.cc/150?img=1"
@@ -122,14 +126,14 @@ const MessageContent = ({
         className={`relative ${
           message?.reactions.length !== 0 && "mb-[1.4rem]"
         }  bg-[var(--cl-snd-200)] text-[0.9em] text-[var(--cl-snd-800)] rounded-2xl ${
-          !isDisplay?.time && !isMyMessage && "rounded-bl-sm"
+          message?.isGroupedWithNext && !isMyMessage && "rounded-bl-sm"
         }  
-         ${!isDisplay?.avatar && !isMyMessage && "rounded-tl-sm"}  
-         ${!isDisplay?.time && isMyMessage && "rounded-br-sm"}  
-         ${!isDisplay?.avatar && isMyMessage && "rounded-tr-sm"}  
+         ${message?.isGroupedWithPrev && !isMyMessage && "rounded-tl-sm"}  
+         ${message?.isGroupedWithNext && isMyMessage && "rounded-br-sm"}  
+         ${message?.isGroupedWithPrev && isMyMessage && "rounded-tr-sm"}  
   px-[1rem] py-[0.6rem]`}
       >
-        {!isMyMessage && isDisplay?.name && (
+        {!isMyMessage && !message?.isGroupedWithPrev && (
           <span className="absolute -top-[1.2rem] text-[0.8rem] w-[50vw] text-[var(--cl-snd-400)]">
             {user?.name || ""}
           </span>
@@ -150,8 +154,11 @@ const MessageContent = ({
             className="cursor-pointer"
             onClick={() => setShowSubEditMenu(["Main Popover"])}
           >
+            {replyMessage && (
+              <MessageReply message={replyMessage} isCloseBtn={false} />
+            )}
             <p>{message.message}</p>
-            {isDisplay?.time && (
+            {!message?.isGroupedWithNext && (
               <span
                 className={`mt-[0.4rem] text-xs text-[var(--cl-snd-600)] w-full flex ${
                   !isMyMessage && "justify-end"

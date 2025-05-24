@@ -4,8 +4,6 @@ import { IoSearch } from "react-icons/io5";
 import { IoMdInformationCircle, IoMdMore } from "react-icons/io";
 import { PiPhoneCallFill } from "react-icons/pi";
 import { MdOutlineVideocam } from "react-icons/md";
-import { groupMessages } from "../helper/message";
-import MessageChunk from "./MessageChunk";
 import CustomEmojiModal from "../components/CustomEmojiModal";
 import EmojiPickerMenu from "../components/EmojiPickerMenu";
 import Tooltip from "../components/Tooltip";
@@ -13,9 +11,10 @@ import { VscSend } from "react-icons/vsc";
 import { BsEmojiSmile } from "react-icons/bs";
 import { HiOutlinePaperClip } from "react-icons/hi2";
 import MessageReply from "./MessageReply";
-import { useSelector } from "react-redux";
 import MessageContent from "./MessageContent";
 import { getTime } from "../helper";
+import { useGetUserProfile } from "../store/userStore";
+import { useGetAllMessage } from "../store/messageStore";
 
 const MessagesContainer = () => {
   const [inputMessage, setInputMessage] = useState("");
@@ -37,8 +36,10 @@ const MessagesContainer = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const { messages, users } = useSelector((state) => state.message);
+  const { data: user } = useGetUserProfile("user1");
 
+  const { data: messages, isLoading: messagesLoading } = useGetAllMessage();
+  console.log(messages);
   const handleOnChange = (e) => {};
 
   const getIsDisplayForMessage = (index) => {
@@ -71,6 +72,7 @@ const MessagesContainer = () => {
 
     return isDisplay;
   };
+  if (messagesLoading) return <div>Loading</div>;
 
   return (
     <div className="flex flex-col h-screen bg-white flex-1">
@@ -78,7 +80,7 @@ const MessagesContainer = () => {
       {/* Header */}
       <div className="flex items-center justify-between p-4  border-[var(--cl-snd-200)] bg-black/5">
         <div className="flex items-center gap-3">
-          <Avatar imgUrl={users[0].profilePictureUrl} isOnline={true} />
+          <Avatar imgUrl={user?.profilePictureUrl} isOnline={true} />
           <div>
             <h1 className="font-semibold text-gray-800">Victoria Lane</h1>
             <p className="text-sm text-gray-500">Online</p>
@@ -107,10 +109,7 @@ const MessagesContainer = () => {
       <div className="flex-1 overflow-y-auto p-[2rem] space-y-1 grid items-end">
         {messages.map((message, index) => (
           <div key={`messsage-${index}`}>
-            <MessageContent
-              message={message}
-              isDisplay={getIsDisplayForMessage(index)}
-            />
+            <MessageContent message={message} />
           </div>
         ))}
       </div>

@@ -12,6 +12,8 @@ const messages = [
     ],
     attachments: [], // no attachments
     isDeleted: false,
+    isGroupedWithPrev: false,
+    isGroupedWithNext: true,
   },
   {
     id: "msg2",
@@ -24,6 +26,8 @@ const messages = [
       { fileUrl: "https://example.com/report.pdf", fileType: "file" }, // file attachment
     ],
     isDeleted: false,
+    isGroupedWithPrev: true,
+    isGroupedWithNext: false,
   },
   {
     id: "msg3",
@@ -38,6 +42,8 @@ const messages = [
     ],
     attachments: [], // no attachments
     isDeleted: false,
+    isGroupedWithPrev: false,
+    isGroupedWithNext: false,
   },
   {
     id: "msg4",
@@ -48,6 +54,8 @@ const messages = [
     reactions: [],
     attachments: [], // no attachments
     isDeleted: false,
+    isGroupedWithPrev: false,
+    isGroupedWithNext: true,
   },
   {
     id: "msg5",
@@ -58,6 +66,8 @@ const messages = [
     reactions: [],
     attachments: [], // no attachments
     isDeleted: false,
+    isGroupedWithPrev: true,
+    isGroupedWithNext: true,
   },
   {
     id: "msg5",
@@ -68,6 +78,8 @@ const messages = [
     reactions: [],
     attachments: [], // no attachments
     isDeleted: false,
+    isGroupedWithPrev: true,
+    isGroupedWithNext: false,
   },
   {
     id: "msg6",
@@ -78,6 +90,8 @@ const messages = [
     reactions: [{ userId: "user2", emoji: "⏱️", emojiLabel: "stopwatch" }],
     attachments: [], // no attachments
     isDeleted: false,
+    isGroupedWithPrev: false,
+    isGroupedWithNext: false,
   },
   {
     id: "msg7",
@@ -92,6 +106,8 @@ const messages = [
     ],
     attachments: [], // no attachments
     isDeleted: false,
+    isGroupedWithPrev: false,
+    isGroupedWithNext: false,
   },
   // 5 more added messages
   {
@@ -103,6 +119,8 @@ const messages = [
     reactions: [{ userId: "user2", emoji: "🍪", emojiLabel: "cookie" }],
     attachments: [],
     isDeleted: false,
+    isGroupedWithPrev: false,
+    isGroupedWithNext: false,
   },
   {
     id: "msg9",
@@ -113,6 +131,8 @@ const messages = [
     reactions: [{ userId: "user3", emoji: "🎤", emojiLabel: "microphone" }],
     attachments: [],
     isDeleted: false,
+    isGroupedWithPrev: false,
+    isGroupedWithNext: false,
   },
   {
     id: "msg10",
@@ -123,6 +143,8 @@ const messages = [
     reactions: [],
     attachments: [],
     isDeleted: false,
+    isGroupedWithPrev: false,
+    isGroupedWithNext: false,
   },
   {
     id: "msg11",
@@ -133,6 +155,8 @@ const messages = [
     reactions: [],
     attachments: [],
     isDeleted: false,
+    isGroupedWithPrev: false,
+    isGroupedWithNext: false,
   },
   {
     id: "msg12",
@@ -146,6 +170,8 @@ const messages = [
     ],
     attachments: [],
     isDeleted: false,
+    isGroupedWithPrev: false,
+    isGroupedWithNext: false,
   },
 ];
 
