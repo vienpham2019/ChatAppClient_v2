@@ -11,12 +11,12 @@ const MessageReply = ({ message, isCloseBtn = false, onClose = () => {} }) => {
   );
   if (userLoading) return <div>Loading...</div>;
   return (
-    <div className="flex gap-2 rounded bg-white border border-[var(--cl-snd-300)] px-1 py-2 max-w-[20rem] shadow-md">
+    <div className="flex gap-2 rounded-lg bg-white border border-[var(--cl-snd-300)] px-1 py-2 max-w-[20rem] shadow-sm">
       <div className="bg-[var(--cl-snd-300)] w-1 h-fix rounded" />
       <div className="flex-1 grid gap-1">
         <div className="flex gap-3 justify-between items-center px-1">
           <div className="flex gap-1 text-[var(--cl-snd-700)]">
-            <small>{user.name}</small>
+            <small>{user?.name || ""}</small>
             <small>{getDate(message.timestamp)}</small>
             <small> {getTime(message.timestamp)}</small>
           </div>

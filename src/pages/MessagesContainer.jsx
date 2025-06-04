@@ -15,12 +15,19 @@ import MessageContent from "./MessageContent";
 import { getTime } from "../helper";
 import { useGetUserProfile } from "../store/userStore";
 import { useGetAllMessage } from "../store/messageStore";
+import { useGetChatRoomInfo } from "../store/chatRoomStore";
 
 const MessagesContainer = () => {
   const [inputMessage, setInputMessage] = useState("");
   const [isEmojiOpen, setIsEmojiOpen] = useState(false);
   const emojiMenuRef = useRef();
   const emojiSkinRef = useRef();
+  const { data: chatRoom, isLoading: chatRoomInfoLoading } =
+    useGetChatRoomInfo(1);
+
+  useEffect(() => {
+    console.log(chatRoom);
+  }, [chatRoom]);
 
   const handleClickOutside = (e) => {
     if (
@@ -72,7 +79,7 @@ const MessagesContainer = () => {
 
     return isDisplay;
   };
-  if (messagesLoading) return <div>Loading</div>;
+  if (messagesLoading || chatRoomInfoLoading) return <div>Loading</div>;
 
   return (
     <div className="flex flex-col h-screen bg-white flex-1">

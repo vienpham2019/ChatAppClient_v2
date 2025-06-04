@@ -22,6 +22,7 @@ const MessageContent = ({ message }) => {
   const [editMessageVal, setEditMessageVal] = useState(message.message);
   const isMyMessage = message.userId === "user1";
   const [isEmojiOpen, setIsEmojiOpen] = useState(false);
+  const [reactions, setReactions] = useState([]);
   const emojiMenuRef = useRef();
   const emojiSkinRef = useRef();
 
@@ -123,9 +124,11 @@ const MessageContent = ({ message }) => {
       )}
 
       <div
-        className={`relative ${
-          message?.reactions.length !== 0 && "mb-[1.4rem]"
-        }  bg-[var(--cl-snd-200)] text-[0.9em] text-[var(--cl-snd-800)] rounded-2xl ${
+        className={`relative
+          ${isMyMessage ? "bg-[var(--cl-prim-200)]" : "bg-[var(--cl-snd-200)]"}
+           ${
+             message?.reactions.length !== 0 && "mb-[1.4rem]"
+           }  text-[0.9em] text-[var(--cl-snd-800)] rounded-2xl ${
           message?.isGroupedWithNext && !isMyMessage && "rounded-bl-sm"
         }  
          ${message?.isGroupedWithPrev && !isMyMessage && "rounded-tl-sm"}  
@@ -175,15 +178,22 @@ const MessageContent = ({ message }) => {
               isMyMessage ? "right-0" : "left-0"
             }`}
           >
-            <div className="bg-[var(--cl-snd-200)] py-[0.2rem] px-[0.4rem] rounded-full border-[0.2rem] border-white flex items-end justify-center gap-1">
-              {message.reactions.slice(0, 5).map(({ emoji }, i) => (
-                <span key={`messsage-${message.id}-reaction-${i}`}>
-                  {emoji}
-                </span>
-              ))}
-              {message.reactions.length > 5 && <span>...</span>}
-              <small className="mr-1">{message.reactions.length}</small>
-            </div>
+            <PopoverMenu
+              isOpen={true}
+              clickOutsideCapture={false}
+              positions={["bottom", "top"]}
+              content={<div>content</div>}
+            >
+              <div className="cursor-pointer bg-[var(--cl-snd-200)] py-[0.2rem] px-[0.4rem] rounded-full border-[0.2rem] border-white flex items-end justify-center gap-1">
+                {message.reactions.slice(0, 5).map(({ emoji }, i) => (
+                  <span key={`messsage-${message.id}-reaction-${i}`}>
+                    {emoji}
+                  </span>
+                ))}
+                {message.reactions.length > 5 && <span>...</span>}
+                <small className="mr-1">{message.reactions.length}</small>
+              </div>
+            </PopoverMenu>
           </div>
         )}{" "}
       </div>
