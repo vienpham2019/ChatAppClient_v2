@@ -1,19 +1,20 @@
 import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
-  currentChatRoomId,
-  users,
+  currentChatRoomId: null,
+  users: {},
 };
 
 const chatRoomSlice = createSlice({
   name: "chatRoom",
   initialState,
   reducers: {
-    setState(state, action) {
+    setChatRoomState(state, action) {
       const { key, value } = action.payload;
+
       state[key] = value;
     },
   },
 });
 
-export const { setState } = chatRoomSlice.actions;
+export const { setChatRoomState } = chatRoomSlice.actions;
 export default chatRoomSlice.reducer;

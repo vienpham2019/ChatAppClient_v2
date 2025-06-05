@@ -12,24 +12,21 @@ import Tooltip from "../components/Tooltip";
 import { getTime } from "../helper";
 import Avatar from "../components/Avatar";
 import MessageReply from "./MessageReply";
-import { useGetUserProfile } from "../store/userStore";
 import { useGetMessageById } from "../store/messageStore";
 
 const MessageContent = ({ message }) => {
   const dispatch = useDispatch();
   const { editMessageId } = useSelector((state) => state.message);
+  const { users } = useSelector((state) => state.chatRoom);
   const [showSubEditMenu, setShowSubEditMenu] = useState([]);
   const [editMessageVal, setEditMessageVal] = useState(message.message);
   const isMyMessage = message.userId === "user1";
   const [isEmojiOpen, setIsEmojiOpen] = useState(false);
+  const [showReactionPopover, setShowReactionPopover] = useState(false);
   const [reactions, setReactions] = useState([]);
   const emojiMenuRef = useRef();
   const emojiSkinRef = useRef();
-
   const { data: replyMessage } = useGetMessageById(message?.replyTo);
-  const { data: user, isLoading: userLoading } = useGetUserProfile(
-    message.userId
-  );
 
   const handleClickOutside = (e) => {
     if (
@@ -45,16 +42,16 @@ const MessageContent = ({ message }) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  if (userLoading)
-    return (
-      <div class="max-w-sm animate-pulse h-[4rem] flex gap-2 mb-[3rem]">
-        <div class=" bg-gray-200 rounded-full dark:bg-gray-700 w-[3rem] h-[3rem]"></div>
-        <div className="gird items-center">
-          <div class="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-[4rem] mb-4"></div>
-          <div class="h-[2rem] bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
-        </div>
-      </div>
-    );
+  // if (userLoading)
+  //   return (
+  //     <div class="max-w-sm animate-pulse h-[4rem] flex gap-2 mb-[3rem]">
+  //       <div class=" bg-gray-200 rounded-full dark:bg-gray-700 w-[3rem] h-[3rem]"></div>
+  //       <div className="gird items-center">
+  //         <div class="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-[4rem] mb-4"></div>
+  //         <div class="h-[2rem] bg-gray-200 rounded-full dark:bg-gray-700 w-48 mb-4"></div>
+  //       </div>
+  //     </div>
+  //   );
 
   if (editMessageId === message.id) {
     return (
@@ -115,7 +112,8 @@ const MessageContent = ({ message }) => {
           {!message?.isGroupedWithPrev && (
             <Avatar
               imgUrl={
-                user?.profilePictureUrl || "https://i.pravatar.cc/150?img=1"
+                users[message.userId]?.profilePictureUrl ||
+                "https://i.pravatar.cc/150?img=1"
               }
               isOnline={true}
             />
@@ -138,7 +136,7 @@ const MessageContent = ({ message }) => {
       >
         {!isMyMessage && !message?.isGroupedWithPrev && (
           <span className="absolute -top-[1.2rem] text-[0.8rem] w-[50vw] text-[var(--cl-snd-400)]">
-            {user?.name || ""}
+            {users[message.userId]?.name || ""}
           </span>
         )}
         <PopoverMenu
@@ -179,12 +177,42 @@ const MessageContent = ({ message }) => {
             }`}
           >
             <PopoverMenu
-              isOpen={true}
+              isOpen={showReactionPopover}
               clickOutsideCapture={false}
               positions={["bottom", "top"]}
-              content={<div>content</div>}
+              content={
+                <div
+                  onMouseEnter={() => setShowReactionPopover(true)}
+                  onMouseLeave={() => setShowReactionPopover(false)}
+                  className="grid gap-2 bg-white p-2 shadow-2xs rounded border border-gray-200"
+                >
+                  {message.reactions.map(({ userId, emoji }) => (
+                    <div className="flex gap-3 items-end justify-between">
+                      <div className="flex gap-2 items-end">
+                        <div className="w-[1.5rem]">
+                          <Avatar
+                            imgUrl={
+                              users[userId]?.profilePictureUrl ||
+                              "https://i.pravatar.cc/150?img=1"
+                            }
+                            isOnline={false}
+                          />
+                        </div>
+                        <span className="text-[0.8rem]">
+                          {users[userId]?.name || "unknow"}
+                        </span>
+                      </div>
+                      <span className="text-[0.8rem]">{emoji}</span>
+                    </div>
+                  ))}
+                </div>
+              }
             >
-              <div className="cursor-pointer bg-[var(--cl-snd-200)] py-[0.2rem] px-[0.4rem] rounded-full border-[0.2rem] border-white flex items-end justify-center gap-1">
+              <div
+                onMouseEnter={() => setShowReactionPopover(true)}
+                onMouseLeave={() => setShowReactionPopover(false)}
+                className="cursor-pointer bg-[var(--cl-snd-200)] py-[0.2rem] px-[0.4rem] rounded-full border-[0.2rem] border-white flex items-end justify-center gap-1"
+              >
                 {message.reactions.slice(0, 5).map(({ emoji }, i) => (
                   <span key={`messsage-${message.id}-reaction-${i}`}>
                     {emoji}

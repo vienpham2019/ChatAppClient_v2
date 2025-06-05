@@ -16,17 +16,22 @@ import { getTime } from "../helper";
 import { useGetUserProfile } from "../store/userStore";
 import { useGetAllMessage } from "../store/messageStore";
 import { useGetChatRoomInfo } from "../store/chatRoomStore";
+import { useDispatch } from "react-redux";
+import { setChatRoomState } from "../store/chatRoomSlice";
 
 const MessagesContainer = () => {
   const [inputMessage, setInputMessage] = useState("");
   const [isEmojiOpen, setIsEmojiOpen] = useState(false);
   const emojiMenuRef = useRef();
   const emojiSkinRef = useRef();
+  const dispatch = useDispatch();
   const { data: chatRoom, isLoading: chatRoomInfoLoading } =
     useGetChatRoomInfo(1);
 
   useEffect(() => {
-    console.log(chatRoom);
+    if (chatRoom?.users) {
+      dispatch(setChatRoomState({ key: "users", value: chatRoom.users }));
+    }
   }, [chatRoom]);
 
   const handleClickOutside = (e) => {
@@ -46,7 +51,6 @@ const MessagesContainer = () => {
   const { data: user } = useGetUserProfile("user1");
 
   const { data: messages, isLoading: messagesLoading } = useGetAllMessage();
-  console.log(messages);
   const handleOnChange = (e) => {};
 
   const getIsDisplayForMessage = (index) => {
