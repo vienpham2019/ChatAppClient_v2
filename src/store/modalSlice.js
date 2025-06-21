@@ -1,11 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  showModal: null,
+  showModal: "GalleryModal",
 };
 
 export const modalEnum = {
   CustomEmojiModal: "CustomEmojiModal",
+  GalleryModal: "GalleryModal",
 };
 
 const modalSlice = createSlice({

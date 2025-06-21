@@ -8,6 +8,7 @@ import { BsEmojiSmile } from "react-icons/bs";
 import EmojiPickerMenu from "../components/EmojiPickerMenu";
 import { setEditMessageId } from "../store/messageSlice";
 import { FaRegTrashAlt } from "react-icons/fa";
+import { FiDownload } from "react-icons/fi";
 import Tooltip from "../components/Tooltip";
 import { getTime } from "../helper";
 import Avatar from "../components/Avatar";
@@ -52,8 +53,8 @@ const MessageContent = ({ message }) => {
   //       </div>
   //     </div>
   //   );
-
-  if (editMessageId === message.id) {
+  if (editMessageId === message.id) renderEdditMessage();
+  const renderEdditMessage = () => {
     return (
       <div className="grid items-center group border border-[var(--cl-snd-200)] rounded  w-[40vw]">
         <textarea
@@ -99,12 +100,194 @@ const MessageContent = ({ message }) => {
         </div>
       </div>
     );
-  }
+  };
+
+  const renderDeletedMessage = () => {
+    const senderName = users[message.userId]?.name?.split(" ")[0] || "Someone";
+    return (
+      <div className="flex items-center border border-gray-400 px-2 text-[0.9em] text-[var(--cl-snd-500)] rounded-2xl">
+        {isMyMessage ? (
+          <span>You removed a message</span>
+        ) : (
+          <span>{senderName} unsent a message</span>
+        )}
+      </div>
+    );
+  };
+
+  const renderReactions = () => {
+    if (!message.reactions?.length) return null;
+
+    return (
+      <div
+        className={`absolute -bottom-[1.6rem] ${
+          isMyMessage ? "right-0" : "left-0"
+        }`}
+      >
+        <PopoverMenu
+          isOpen={showReactionPopover}
+          clickOutsideCapture={false}
+          positions={["bottom", "top"]}
+          content={
+            <div
+              onMouseEnter={() => setShowReactionPopover(true)}
+              onMouseLeave={() => setShowReactionPopover(false)}
+              className="grid gap-2 bg-white p-2 shadow-2xs rounded border border-gray-200"
+            >
+              {message.reactions.map(({ userId, emoji }, i) => (
+                <div
+                  key={`reaction-${i}`}
+                  className="flex gap-3 items-end justify-between"
+                >
+                  <div className="flex gap-2 items-end">
+                    <div className="w-[1.5rem]">
+                      <Avatar
+                        imgUrl={
+                          users[userId]?.profilePictureUrl ||
+                          "https://i.pravatar.cc/150?img=1"
+                        }
+                        isOnline={false}
+                      />
+                    </div>
+                    <span className="text-[0.8rem] max-w-[10rem] truncate">
+                      {users[userId]?.name || "Unknown"}
+                    </span>
+                  </div>
+                  <span className="text-[0.8rem]">{emoji}</span>
+                </div>
+              ))}
+            </div>
+          }
+        >
+          <div
+            onMouseEnter={() => setShowReactionPopover(true)}
+            onMouseLeave={() => setShowReactionPopover(false)}
+            className="cursor-pointer bg-[var(--cl-snd-200)] py-[0.2rem] px-[0.4rem] rounded-full border-[0.2rem] border-white flex items-end justify-center gap-1"
+          >
+            {message.reactions.slice(0, 5).map(({ emoji }, i) => (
+              <span key={`messsage-${message.id}-reaction-${i}`}>{emoji}</span>
+            ))}
+            {message.reactions.length > 5 && <span>...</span>}
+            <small className="mr-1">{message.reactions.length}</small>
+          </div>
+        </PopoverMenu>
+      </div>
+    );
+  };
+
+  const renderImages = () => {
+    const images = [
+      "https://plus.unsplash.com/premium_photo-1675432656807-216d786dd468?q=80&w=1980&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", // Dog
+      "https://images.unsplash.com/photo-1592194996308-7b43878e84a6", // Cat
+      "https://images.unsplash.com/photo-1474511320723-9a56873867b5?q=80&w=2072&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", // Rabbit
+      "https://images.unsplash.com/photo-1497206365907-f5e630693df0?q=80&w=2080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1555169062-013468b47731?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    ];
+
+    return (
+      <div
+        className={`${
+          images.length > 1 && "grid items-center grid-cols-2 gap-2"
+        }`}
+      >
+        {images.slice(0, images.length > 4 ? 3 : 4).map((imgUrl, index) => (
+          <div className="group relative ">
+            <div className="absolute w-full h-full bg-gray-900/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-center justify-center">
+              <Tooltip text={"Download Image"}>
+                <button className="cursor-pointer inline-flex items-center justify-center rounded-full h-8 w-8 bg-white/30 hover:bg-white/50 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50">
+                  <FiDownload className="w-4 h-4 text-white" />
+                </button>
+              </Tooltip>
+            </div>
+            <img src={imgUrl} className="rounded-lg max-h-[30rem]" />
+          </div>
+        ))}
+        {images.length > 4 && (
+          <div className="group relative">
+            <button className="cursor-pointer absolute w-full h-full bg-gray-900/90 hover:bg-gray-900/50 transition-all duration-300 rounded-lg flex items-center justify-center">
+              <span className="text-xl font-medium text-white">
+                +{images.length - 3}
+              </span>
+            </button>
+            <img src={images[3]} className="rounded-lg" />
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderMessageContent = () => {
+    const {
+      isGroupedWithNext: isGN,
+      isGroupedWithPrev: isGP,
+      reactions,
+    } = message;
+    const groupedClasses = `relative
+    ${isMyMessage ? "bg-[var(--cl-prim-200)]" : "bg-[var(--cl-snd-200)]"}
+    ${reactions.length !== 0 && "mb-[1.4rem]"} 
+    ${isGN && !isMyMessage && "rounded-bl-sm"}  
+    ${isGP && !isMyMessage && "rounded-tl-sm"}  
+    ${isGN && isMyMessage && "rounded-br-sm"}  
+    ${isGP && isMyMessage && "rounded-tr-sm"}  
+    text-[0.9em] text-[var(--cl-snd-800)] rounded-2xl px-[1rem] py-[0.6rem]
+    `;
+
+    return (
+      <div className={groupedClasses}>
+        {!isMyMessage && !isGP && (
+          <span className="absolute -top-[1.2rem] text-[0.8rem] w-[50vw] text-[var(--cl-snd-400)]">
+            {users[message.userId]?.name || ""}
+          </span>
+        )}
+
+        <PopoverMenu
+          isOpen={showSubEditMenu.length >= 1}
+          clickOutsideCapture={false}
+          positions={["top", "bottom"]}
+          content={() => (
+            <MessagePopover
+              onClose={() => setShowSubEditMenu([])}
+              showSubEditMenu={showSubEditMenu}
+              setShowSubEditMenu={setShowSubEditMenu}
+            />
+          )}
+        >
+          <div
+            className="cursor-pointer max-w-[40rem]"
+            onClick={() => setShowSubEditMenu(["Main Popover"])}
+          >
+            {replyMessage && (
+              <MessageReply message={replyMessage} isCloseBtn={false} />
+            )}
+            {message?.images?.length > 0 && renderImages()}
+            <p>{message.message}</p>
+            {!isGN && (
+              <span
+                className={`mt-[0.4rem] text-xs text-[var(--cl-snd-600)] w-full flex ${
+                  !isMyMessage && "justify-end"
+                }`}
+              >
+                {getTime(message.timestamp)}
+              </span>
+            )}
+          </div>
+        </PopoverMenu>
+
+        {renderReactions()}
+      </div>
+    );
+  };
+
+  const handleDisplayMessage = () => {
+    if (!message) return null;
+    if (message.isDeleted) return renderDeletedMessage();
+    return renderMessageContent();
+  };
 
   return (
     <div
       className={`flex ${isMyMessage && "flex-row-reverse"} ${
-        !message?.isGroupedWithPrev && "mt-[2rem]"
+        !message?.isGroupedWithPrev && "mt-[1.5rem]"
       } items-top group`}
     >
       {!isMyMessage && (
@@ -120,111 +303,7 @@ const MessageContent = ({ message }) => {
           )}
         </div>
       )}
-
-      <div
-        className={`relative
-          ${isMyMessage ? "bg-[var(--cl-prim-200)]" : "bg-[var(--cl-snd-200)]"}
-           ${
-             message?.reactions.length !== 0 && "mb-[1.4rem]"
-           }  text-[0.9em] text-[var(--cl-snd-800)] rounded-2xl ${
-          message?.isGroupedWithNext && !isMyMessage && "rounded-bl-sm"
-        }  
-         ${message?.isGroupedWithPrev && !isMyMessage && "rounded-tl-sm"}  
-         ${message?.isGroupedWithNext && isMyMessage && "rounded-br-sm"}  
-         ${message?.isGroupedWithPrev && isMyMessage && "rounded-tr-sm"}  
-  px-[1rem] py-[0.6rem]`}
-      >
-        {!isMyMessage && !message?.isGroupedWithPrev && (
-          <span className="absolute -top-[1.2rem] text-[0.8rem] w-[50vw] text-[var(--cl-snd-400)]">
-            {users[message.userId]?.name || ""}
-          </span>
-        )}
-        <PopoverMenu
-          isOpen={showSubEditMenu.length >= 1}
-          clickOutsideCapture={false}
-          positions={["top", "bottom"]}
-          content={() => (
-            <MessagePopover
-              onClose={() => setShowSubEditMenu([])}
-              showSubEditMenu={showSubEditMenu}
-              setShowSubEditMenu={setShowSubEditMenu}
-            />
-          )}
-        >
-          <div
-            className="cursor-pointer"
-            onClick={() => setShowSubEditMenu(["Main Popover"])}
-          >
-            {replyMessage && (
-              <MessageReply message={replyMessage} isCloseBtn={false} />
-            )}
-            <p>{message.message}</p>
-            {!message?.isGroupedWithNext && (
-              <span
-                className={`mt-[0.4rem] text-xs text-[var(--cl-snd-600)] w-full flex ${
-                  !isMyMessage && "justify-end"
-                }`}
-              >
-                {getTime(message.timestamp)}
-              </span>
-            )}
-          </div>
-        </PopoverMenu>
-        {message.reactions.length > 0 && (
-          <div
-            className={`absolute -bottom-[1.6rem] ${
-              isMyMessage ? "right-0" : "left-0"
-            }`}
-          >
-            <PopoverMenu
-              isOpen={showReactionPopover}
-              clickOutsideCapture={false}
-              positions={["bottom", "top"]}
-              content={
-                <div
-                  onMouseEnter={() => setShowReactionPopover(true)}
-                  onMouseLeave={() => setShowReactionPopover(false)}
-                  className="grid gap-2 bg-white p-2 shadow-2xs rounded border border-gray-200"
-                >
-                  {message.reactions.map(({ userId, emoji }) => (
-                    <div className="flex gap-3 items-end justify-between">
-                      <div className="flex gap-2 items-end">
-                        <div className="w-[1.5rem]">
-                          <Avatar
-                            imgUrl={
-                              users[userId]?.profilePictureUrl ||
-                              "https://i.pravatar.cc/150?img=1"
-                            }
-                            isOnline={false}
-                          />
-                        </div>
-                        <span className="text-[0.8rem]">
-                          {users[userId]?.name || "unknow"}
-                        </span>
-                      </div>
-                      <span className="text-[0.8rem]">{emoji}</span>
-                    </div>
-                  ))}
-                </div>
-              }
-            >
-              <div
-                onMouseEnter={() => setShowReactionPopover(true)}
-                onMouseLeave={() => setShowReactionPopover(false)}
-                className="cursor-pointer bg-[var(--cl-snd-200)] py-[0.2rem] px-[0.4rem] rounded-full border-[0.2rem] border-white flex items-end justify-center gap-1"
-              >
-                {message.reactions.slice(0, 5).map(({ emoji }, i) => (
-                  <span key={`messsage-${message.id}-reaction-${i}`}>
-                    {emoji}
-                  </span>
-                ))}
-                {message.reactions.length > 5 && <span>...</span>}
-                <small className="mr-1">{message.reactions.length}</small>
-              </div>
-            </PopoverMenu>
-          </div>
-        )}{" "}
-      </div>
+      {handleDisplayMessage()}
     </div>
   );
 };

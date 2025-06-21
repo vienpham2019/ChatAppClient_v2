@@ -18,6 +18,7 @@ import { useGetAllMessage } from "../store/messageStore";
 import { useGetChatRoomInfo } from "../store/chatRoomStore";
 import { useDispatch } from "react-redux";
 import { setChatRoomState } from "../store/chatRoomSlice";
+import GalleryModal from "../components/GalleryModal";
 
 const MessagesContainer = () => {
   const [inputMessage, setInputMessage] = useState("");
