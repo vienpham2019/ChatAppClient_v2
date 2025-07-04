@@ -14,10 +14,12 @@ const modalSlice = createSlice({
   initialState,
   reducers: {
     setShowModal(state, action) {
+      console.log("set modal");
       state.showModal = action.payload;
     },
 
     setCloseModal(state) {
+      console.log("close modal");
       state.showModal = null;
     },
   },

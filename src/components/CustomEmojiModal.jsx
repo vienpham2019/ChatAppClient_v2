@@ -27,6 +27,7 @@ const CustomEmojiModal = () => {
   const menuRef = useRef();
 
   const handleClickOutside = (e) => {
+    if (showModal !== modalEnum?.CustomEmojiModal) return;
     if (
       !menuRef?.current?.contains(e.target) &&
       !emojiMenuRef?.current?.contains(e.target) &&
@@ -102,6 +103,10 @@ const CustomEmojiModal = () => {
           <button
             onClick={() => {
               setEmojiPickerIndex(-1);
+              {
+                console.log("call set modal from custom emoji modal");
+                dispatch(setShowModal(modalEnum.GalleryModal));
+              }
               dispatch(setShowModal(null));
             }}
             className="cursor-pointer hover:bg-gray-100 border border-[var(--cl-snd-500)] w-[6rem] p-2 rounded-lg"

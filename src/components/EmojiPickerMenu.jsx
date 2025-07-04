@@ -198,9 +198,12 @@ const EmojiPickerMenu = ({
             </div>
             {showCustomModal && (
               <div
-                onClick={() =>
-                  dispatch(setShowModal(modalEnum.CustomEmojiModal))
-                }
+                onClick={() => {
+                  {
+                    console.log("call set modal from emoji picker");
+                    dispatch(setShowModal(modalEnum.CustomEmojiModal));
+                  }
+                }}
                 className="emoji-btn"
               >
                 <Tooltip text={"Custom Default Reactions"} dir={"left"}>

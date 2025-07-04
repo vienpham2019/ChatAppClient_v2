@@ -1,5 +1,5 @@
-import { useSelector } from "react-redux";
-import { modalEnum } from "../store/modalSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { modalEnum, setCloseModal } from "../store/modalSlice";
 import Modal from "./Modal";
 import {
   Pagination,
@@ -10,21 +10,31 @@ import {
   Keyboard,
   Thumbs,
   FreeMode,
+  Controller,
 } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/react";
+import { Swiper, SwiperSlide, useSwiper } from "swiper/react";
 // Import Swiper styles
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
 import { useEffect, useRef, useState } from "react";
 import { RxCross1, RxCross2 } from "react-icons/rx";
-import { TfiDownload } from "react-icons/tfi";
-import { BsPlayCircle, BsStopCircle } from "react-icons/bs";
+import {
+  BsPlayCircle,
+  BsStopCircle,
+  BsZoomIn,
+  BsFullscreen,
+  BsDownload,
+} from "react-icons/bs";
+import Tooltip from "./Tooltip";
 
 const GalleryModal = () => {
+  const dispatch = useDispatch();
   const { showModal } = useSelector((state) => state.modal);
+  const swiperRef = useRef();
+  const swiperRefThumbs = useRef();
   const images = [
-    // "https://plus.unsplash.com/premium_photo-1675432656807-216d786dd468?q=80&w=1980&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", // Dog
+    "https://plus.unsplash.com/premium_photo-1675432656807-216d786dd468?q=80&w=1980&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", // Dog
     "https://images.unsplash.com/photo-1592194996308-7b43878e84a6", // Cat
     "https://media.istockphoto.com/id/589563524/photo/white-rabbit-on-green-grass.jpg?s=612x612&w=0&k=20&c=jMWMyavOEm3p8hNQF8WJ-ZIZ8ODES3Z5iDQ6Snwku8E=",
     "https://t3.ftcdn.net/jpg/02/47/33/08/360_F_247330858_RvSJWAhMbfrqsM5VUmjLD4gzzSKUaJls.jpg", // Rabbit
@@ -42,32 +52,119 @@ const GalleryModal = () => {
     "https://media.istockphoto.com/id/1399292810/photo/group-of-wildlife-animals-in-the-jungle-together.jpg?s=612x612&w=0&k=20&c=NXVzp7awiZhUf-OjcSmaDTcWz3h_XyGcozlTFD883eg=",
     "https://detroitzooblog.org/wp-content/uploads/2019/04/45691596745_c0fda47e8a_k.jpg",
   ];
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
+  const [isAutoplay, setIsAutoplay] = useState(false);
+  const [zoomInVal, setZoomInVal] = useState(1);
+
   const progressCircle = useRef(null);
   const progressContent = useRef(null);
+
   const onAutoplayTimeLeft = (s, time, progress) => {
+    if (!progressCircle?.current?.style) return;
     progressCircle.current.style.setProperty("--progress", 1 - progress);
     progressContent.current.textContent = `${Math.ceil(time / 1000)}s`;
   };
   const [thumbsSwiper, setThumbsSwiper] = useState(null);
+  useEffect(() => {
+    if (!swiperRef?.current) return;
+    if (isAutoplay) {
+      swiperRef.current.autoplay.start();
+    } else {
+      swiperRef.current.autoplay.stop();
+    }
+  }, [isAutoplay]);
+
+  useEffect(() => {
+    if (showModal !== modalEnum.GalleryModal) {
+      swiperRef.current = null;
+      setZoomInVal(1);
+      setIsAutoplay(false);
+    }
+  }, [showModal]);
+
+  const handleZoom = (ratio) => {
+    if (!swiperRef?.current) return;
+    setIsAutoplay(false);
+    if (ratio > 0) {
+      swiperRef.current.zoom.in(zoomInVal + 1);
+      setZoomInVal(zoomInVal + 1);
+    } else {
+      swiperRef.current.zoom.out(1);
+      setZoomInVal(1);
+    }
+  };
+
+  const downloadImage = (url, filename = "image.jpg") => {
+    //latter
+  };
+
+  const goToSlide = (index) => {
+    if (swiperRef?.current) {
+      setCurrentSlideIndex(index);
+      swiperRef.current.slideTo(index);
+    }
+  };
+
+  useEffect(() => {
+    console.log(showModal);
+  }, [showModal]);
 
   return (
-    // <Modal isOpen={showModal === modalEnum.CustomEmojiModal}>
-    <Modal isOpen={true}>
+    <Modal isOpen={showModal === modalEnum.GalleryModal}>
+      {/* <Modal isOpen={true}> */}
       <div className="absolute pr-[2rem] flex items-center gap-[2rem] text-[#eaeaea] z-[20] top-0 right-0  h-[3rem] ">
-        <span>
-          <BsPlayCircle />
-        </span>
-        <span>
-          <BsStopCircle />
-        </span>
-        <span>
-          <TfiDownload />
-        </span>
-        <span>
-          <RxCross1 />
-        </span>
+        {!isAutoplay ? (
+          <Tooltip text={"Play"} dir={"bottom"}>
+            <span
+              className="cursor-pointer"
+              onClick={() => setIsAutoplay(true)}
+            >
+              <BsPlayCircle />
+            </span>
+          </Tooltip>
+        ) : (
+          <Tooltip text={"Pause"} dir={"bottom"}>
+            <span
+              className="cursor-pointer"
+              onClick={() => setIsAutoplay(false)}
+            >
+              <BsStopCircle />
+            </span>
+          </Tooltip>
+        )}
+        {zoomInVal > 1 && (
+          <Tooltip text={"Reset Zoom"} dir={"bottom"}>
+            <span className="cursor-pointer" onClick={() => handleZoom(-1)}>
+              <BsFullscreen />
+            </span>
+          </Tooltip>
+        )}
+        <Tooltip text={"Zoom In"} dir={"bottom"}>
+          <span className="cursor-pointer" onClick={() => handleZoom(1)}>
+            <BsZoomIn />
+          </span>
+        </Tooltip>
+
+        <Tooltip text={"Download"} dir={"bottom"}>
+          <span className="cursor-pointer" onClick={() => downloadImage()}>
+            <BsDownload />
+          </span>
+        </Tooltip>
+        <div className="h-[1rem] border border-gray-400"></div>
+        <Tooltip text={"Exit"} dir={"bottom"}>
+          <span
+            className="cursor-pointer"
+            onClick={() => {
+              dispatch(setCloseModal());
+              // thumbsSwiper.current = null;
+            }}
+          >
+            <RxCross1 />
+          </span>
+        </Tooltip>
       </div>
       <Swiper
+        key={images.length}
         style={{
           "--swiper-navigation-color": "#fff",
           "--swiper-pagination-color": "#fff",
@@ -78,17 +175,36 @@ const GalleryModal = () => {
         }}
         slidesPerView={"auto"}
         spaceBetween={20}
-        centeredSlides={true}
-        zoom={true}
+        zoom={{
+          maxRatio: 5,
+          minRatio: 1,
+        }}
         navigation={true}
         lazy={true}
         loop={true}
-        thumbs={{ swiper: thumbsSwiper }}
         keyboard={{
           enabled: true,
         }}
         pagination={{
           type: "fraction",
+        }}
+        onSwiper={(swiperInstance) => {
+          // get instance of this swiper and save in a react ref
+
+          if (!swiperInstance) return;
+          swiperRef.current = swiperInstance;
+          // setSwiper(swiperInstance);
+          setZoomInVal(1);
+        }}
+        onSlideChange={(swiperInstance) => {
+          const index_currentSlide = swiperInstance.realIndex;
+          setCurrentSlideIndex(index_currentSlide);
+          if (swiperRefThumbs?.current) {
+            swiperRefThumbs.current.slideTo(index_currentSlide);
+          }
+        }}
+        onZoomChange={(_, scale) => {
+          setZoomInVal(scale);
         }}
         onAutoplayTimeLeft={onAutoplayTimeLeft}
         modules={[
@@ -96,14 +212,14 @@ const GalleryModal = () => {
           Zoom,
           Pagination,
           Navigation,
-          EffectCoverflow,
+          // EffectCoverflow,
           Autoplay,
-          Thumbs,
+          // Thumbs,
         ]}
         className="mySwiper"
       >
-        {images.map((imgUrl) => (
-          <SwiperSlide>
+        {images.map((imgUrl, i) => (
+          <SwiperSlide key={i}>
             <div className="swiper-zoom-container flex justify-center items-center h-full w-full py-3">
               <img
                 className="rounded max-h-full w-auto"
@@ -115,28 +231,41 @@ const GalleryModal = () => {
             <div className="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
           </SwiperSlide>
         ))}
-        <div className="autoplay-progress" slot="container-end">
-          <svg viewBox="0 0 48 48" ref={progressCircle}>
-            <circle cx="24" cy="24" r="20"></circle>
-          </svg>
-          <span ref={progressContent}></span>
-        </div>
+        {isAutoplay && (
+          <div className="autoplay-progress" slot="container-end">
+            <svg viewBox="0 0 48 48" ref={progressCircle}>
+              <circle cx="24" cy="24" r="20"></circle>
+            </svg>
+            <span ref={progressContent}></span>
+          </div>
+        )}
       </Swiper>
       <Swiper
-        onSwiper={setThumbsSwiper}
+        key={`thumbs-${images.length}`}
         spaceBetween={2}
         slidesPerView={"auto"}
         freeMode={true}
-        // centeredSlides={true}
-        loop={true}
+        // loop={true}
         lazy={true}
-        watchSlidesProgress={true}
-        modules={[FreeMode, Navigation, Thumbs]}
+        onSwiper={(swiperInstance) => {
+          // get instance of this swiper and save in a react ref
+
+          if (!swiperInstance) return;
+          swiperRefThumbs.current = swiperInstance;
+        }}
+        modules={[Navigation]}
         className="mySwiper2"
       >
-        {images.map((imgUrl) => (
-          <SwiperSlide>
-            {/* <div className="flex border h-full w-fit"> */}
+        {images.map((imgUrl, i) => (
+          <SwiperSlide
+            key={i}
+            className={
+              i === currentSlideIndex
+                ? "border-2 border-red-600 opacity-100"
+                : "border-2 border-gray-100 opacity-30"
+            }
+            onClick={() => goToSlide(i)}
+          >
             <img
               className="rounded h-full"
               src={imgUrl}
@@ -144,7 +273,6 @@ const GalleryModal = () => {
               loading="lazy"
             />
             <div className="swiper-lazy-preloader swiper-lazy-preloader-white"></div>
-            {/* </div> */}
           </SwiperSlide>
         ))}
       </Swiper>

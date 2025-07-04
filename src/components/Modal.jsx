@@ -1,4 +1,5 @@
 const Modal = ({ isOpen, children }) => {
+  console.log(isOpen);
   if (!isOpen) return;
   return (
     <div

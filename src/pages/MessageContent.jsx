@@ -14,6 +14,7 @@ import { getTime } from "../helper";
 import Avatar from "../components/Avatar";
 import MessageReply from "./MessageReply";
 import { useGetMessageById } from "../store/messageStore";
+import { modalEnum, setShowModal } from "../store/modalSlice";
 
 const MessageContent = ({ message }) => {
   const dispatch = useDispatch();
@@ -191,7 +192,13 @@ const MessageContent = ({ message }) => {
         }`}
       >
         {images.slice(0, images.length > 4 ? 3 : 4).map((imgUrl, index) => (
-          <div className="group relative ">
+          <div
+            className="group relative "
+            onClick={() => {
+              console.log("call set modal from message content");
+              dispatch(setShowModal(modalEnum.GalleryModal));
+            }}
+          >
             <div className="absolute w-full h-full bg-gray-900/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-center justify-center">
               <Tooltip text={"Download Image"}>
                 <button className="cursor-pointer inline-flex items-center justify-center rounded-full h-8 w-8 bg-white/30 hover:bg-white/50 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50">
