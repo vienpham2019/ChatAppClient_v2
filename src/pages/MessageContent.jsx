@@ -195,7 +195,7 @@ const MessageContent = ({ message }) => {
           <div
             className="group relative "
             onClick={() => {
-              console.log("call set modal from message content");
+              // console.log("call set modal from message content");
               dispatch(setShowModal(modalEnum.GalleryModal));
             }}
           >

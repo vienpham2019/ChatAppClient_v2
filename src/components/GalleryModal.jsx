@@ -64,12 +64,13 @@ const GalleryModal = () => {
     progressCircle.current.style.setProperty("--progress", 1 - progress);
     progressContent.current.textContent = `${Math.ceil(time / 1000)}s`;
   };
-  const [thumbsSwiper, setThumbsSwiper] = useState(null);
+
   useEffect(() => {
     if (!swiperRef?.current) return;
     if (isAutoplay) {
       swiperRef.current.autoplay.start();
     } else {
+      swiperRef.current.autoplay.resume();
       swiperRef.current.autoplay.stop();
     }
   }, [isAutoplay]);
@@ -83,8 +84,8 @@ const GalleryModal = () => {
   }, [showModal]);
 
   const handleZoom = (ratio) => {
-    if (!swiperRef?.current) return;
     setIsAutoplay(false);
+    if (!swiperRef?.current) return;
     if (ratio > 0) {
       swiperRef.current.zoom.in(zoomInVal + 1);
       setZoomInVal(zoomInVal + 1);
@@ -99,6 +100,7 @@ const GalleryModal = () => {
   };
 
   const goToSlide = (index) => {
+    setIsAutoplay(false);
     if (swiperRef?.current) {
       setCurrentSlideIndex(index);
       swiperRef.current.slideTo(index);
@@ -156,7 +158,6 @@ const GalleryModal = () => {
             className="cursor-pointer"
             onClick={() => {
               dispatch(setCloseModal());
-              // thumbsSwiper.current = null;
             }}
           >
             <RxCross1 />
@@ -169,10 +170,6 @@ const GalleryModal = () => {
           "--swiper-navigation-color": "#fff",
           "--swiper-pagination-color": "#fff",
         }}
-        autoplay={{
-          delay: 3500,
-          disableOnInteraction: false,
-        }}
         slidesPerView={"auto"}
         spaceBetween={20}
         zoom={{
@@ -181,7 +178,7 @@ const GalleryModal = () => {
         }}
         navigation={true}
         lazy={true}
-        loop={true}
+        // loop={true}
         keyboard={{
           enabled: true,
         }}
@@ -207,15 +204,7 @@ const GalleryModal = () => {
           setZoomInVal(scale);
         }}
         onAutoplayTimeLeft={onAutoplayTimeLeft}
-        modules={[
-          Keyboard,
-          Zoom,
-          Pagination,
-          Navigation,
-          // EffectCoverflow,
-          Autoplay,
-          // Thumbs,
-        ]}
+        modules={[Keyboard, Zoom, Pagination, Navigation, Autoplay]}
         className="mySwiper"
       >
         {images.map((imgUrl, i) => (
@@ -245,7 +234,6 @@ const GalleryModal = () => {
         spaceBetween={2}
         slidesPerView={"auto"}
         freeMode={true}
-        // loop={true}
         lazy={true}
         onSwiper={(swiperInstance) => {
           // get instance of this swiper and save in a react ref
@@ -254,7 +242,7 @@ const GalleryModal = () => {
           swiperRefThumbs.current = swiperInstance;
         }}
         modules={[Navigation]}
-        className="mySwiper2"
+        className="mySwiper2 "
       >
         {images.map((imgUrl, i) => (
           <SwiperSlide

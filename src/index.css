@@ -87,20 +87,17 @@ h6 {
 .mySwiper2 {
   height: 10vh;
   width: auto;
+  display: flex !important;
+  justify-content: center;
 }
 
-/* .mySwiper2 .swiper-slide {
-  width: auto;
-  cursor: pointer;
-  opacity: 0.4;
-  border: 2px solid rgb(216, 216, 216);
-  border-radius: 7px;
-} */
+.mySwiper2 .swiper-wrapper {
+  width: fit-content !important;
+}
+
 .mySwiper2 .swiper-slide {
-  width: 9%;
+  width: auto;
   height: 100%;
-  /* opacity: 0.4; */
-  /* border: 2px solid rgb(216, 216, 216); */
   border-radius: 3px;
   display: flex;
   justify-items: center;
@@ -108,11 +105,6 @@ h6 {
   background-color: rgb(55, 54, 54);
   cursor: pointer;
 }
-
-/* .mySwiper2 .swiper-slide-thumb-active {
-  opacity: 1;
-  border-color: rgb(255, 8, 8);
-} */
 
 .autoplay-progress {
   position: absolute;
