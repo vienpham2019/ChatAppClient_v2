@@ -6,15 +6,14 @@ import { RxCross1 } from "react-icons/rx";
 import { IoMdCheckmark } from "react-icons/io";
 import { BsEmojiSmile } from "react-icons/bs";
 import EmojiPickerMenu from "../components/EmojiPickerMenu";
-import { setEditMessageId } from "../store/messageSlice";
-import { FaRegTrashAlt } from "react-icons/fa";
-import { FiDownload } from "react-icons/fi";
+import { setEditMessageId, setReplyMessage } from "../store/messageSlice";
+import { FaEye, FaRegTrashAlt } from "react-icons/fa";
 import Tooltip from "../components/Tooltip";
 import { getTime } from "../helper";
 import Avatar from "../components/Avatar";
 import MessageReply from "./MessageReply";
 import { useGetMessageById } from "../store/messageStore";
-import { modalEnum, setShowModal } from "../store/modalSlice";
+import { modalEnum, setModalContents, setShowModal } from "../store/modalSlice";
 
 const MessageContent = ({ message }) => {
   const dispatch = useDispatch();
@@ -177,13 +176,7 @@ const MessageContent = ({ message }) => {
   };
 
   const renderImages = () => {
-    const images = [
-      "https://plus.unsplash.com/premium_photo-1675432656807-216d786dd468?q=80&w=1980&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", // Dog
-      "https://images.unsplash.com/photo-1592194996308-7b43878e84a6", // Cat
-      "https://images.unsplash.com/photo-1474511320723-9a56873867b5?q=80&w=2072&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", // Rabbit
-      "https://images.unsplash.com/photo-1497206365907-f5e630693df0?q=80&w=2080&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-      "https://images.unsplash.com/photo-1555169062-013468b47731?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    ];
+    const { images } = message;
 
     return (
       <div
@@ -193,16 +186,17 @@ const MessageContent = ({ message }) => {
       >
         {images.slice(0, images.length > 4 ? 3 : 4).map((imgUrl, index) => (
           <div
-            className="group relative "
+            key={index}
+            className="group/item relative "
             onClick={() => {
-              // console.log("call set modal from message content");
               dispatch(setShowModal(modalEnum.GalleryModal));
+              dispatch(setModalContents({ images, index }));
             }}
           >
-            <div className="absolute w-full h-full bg-gray-900/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex items-center justify-center">
-              <Tooltip text={"Download Image"}>
+            <div className="absolute w-full h-full bg-gray-900/50 opacity-0 group-hover/item:opacity-100 transition-opacity duration-300 rounded-lg flex items-center justify-center">
+              <Tooltip text={"View Image"}>
                 <button className="cursor-pointer inline-flex items-center justify-center rounded-full h-8 w-8 bg-white/30 hover:bg-white/50 focus:ring-4 focus:outline-none dark:text-white focus:ring-gray-50">
-                  <FiDownload className="w-4 h-4 text-white" />
+                  <FaEye className="w-4 h-4 text-white" />
                 </button>
               </Tooltip>
             </div>
@@ -210,7 +204,13 @@ const MessageContent = ({ message }) => {
           </div>
         ))}
         {images.length > 4 && (
-          <div className="group relative">
+          <div
+            className="group relative"
+            onClick={() => {
+              dispatch(setShowModal(modalEnum.GalleryModal));
+              dispatch(setModalContents({ images, index: 3 }));
+            }}
+          >
             <button className="cursor-pointer absolute w-full h-full bg-gray-900/90 hover:bg-gray-900/50 transition-all duration-300 rounded-lg flex items-center justify-center">
               <span className="text-xl font-medium text-white">
                 +{images.length - 3}
@@ -256,6 +256,7 @@ const MessageContent = ({ message }) => {
               onClose={() => setShowSubEditMenu([])}
               showSubEditMenu={showSubEditMenu}
               setShowSubEditMenu={setShowSubEditMenu}
+              onReply={() => dispatch(setReplyMessage(message))}
             />
           )}
         >

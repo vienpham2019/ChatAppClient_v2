@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   showModal: "GalleryModal",
+  contents: null,
 };
 
 export const modalEnum = {
@@ -14,16 +15,20 @@ const modalSlice = createSlice({
   initialState,
   reducers: {
     setShowModal(state, action) {
-      console.log("set modal");
       state.showModal = action.payload;
     },
 
+    setModalContents(state, action) {
+      state.contents = action.payload;
+    },
+
     setCloseModal(state) {
-      console.log("close modal");
       state.showModal = null;
+      state.contents = null;
     },
   },
 });
 
-export const { setShowModal, setCloseModal } = modalSlice.actions;
+export const { setShowModal, setCloseModal, setModalContents } =
+  modalSlice.actions;
 export default modalSlice.reducer;

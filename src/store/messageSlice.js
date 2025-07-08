@@ -196,6 +196,7 @@ const users = [
 const initialState = {
   showSubEditMenu: false,
   editMessageId: "1-1",
+  replyMessage: null,
   messages,
   users,
 };
@@ -210,8 +211,13 @@ const messageSlice = createSlice({
     setEditMessageId(state, action) {
       state.editMessageId = action.payload;
     },
+    setReplyMessage(state, action) {
+      console.log(action.payload);
+      state.replyMessage = action.payload;
+    },
   },
 });
 
-export const { setShowSubEditMenu, setEditMessageId } = messageSlice.actions;
+export const { setShowSubEditMenu, setEditMessageId, setReplyMessage } =
+  messageSlice.actions;
 export default messageSlice.reducer;

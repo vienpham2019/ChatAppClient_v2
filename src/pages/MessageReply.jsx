@@ -3,8 +3,12 @@ import { getDate, getTime } from "../helper";
 import { RxCross1 } from "react-icons/rx";
 import Tooltip from "../components/Tooltip";
 import { useGetUserProfile } from "../store/userStore";
+import { useDispatch } from "react-redux";
+import { setReplyMessage } from "../store/messageSlice";
+import { MdPhotoCamera } from "react-icons/md";
 
 const MessageReply = ({ message, isCloseBtn = false, onClose = () => {} }) => {
+  const dispatch = useDispatch();
   if (!message) return;
   const { data: user, isLoading: userLoading } = useGetUserProfile(
     message?.userId
@@ -21,18 +25,20 @@ const MessageReply = ({ message, isCloseBtn = false, onClose = () => {} }) => {
             <small> {getTime(message.timestamp)}</small>
           </div>
           {isCloseBtn && (
-            <Tooltip text={"Remove Reference"}>
-              <RxCross1
-                onClick={onClose}
-                className="cursor-pointer text-[var(--cl-snd-600)]  hover:text-[var(--cl-prim-600)]"
-              />
-            </Tooltip>
+            <div onClick={() => dispatch(setReplyMessage(null))}>
+              <Tooltip text={"Remove Reference"}>
+                <RxCross1
+                  onClick={onClose}
+                  className="cursor-pointer text-[var(--cl-snd-600)]  hover:text-[var(--cl-prim-600)]"
+                />
+              </Tooltip>
+            </div>
           )}
         </div>
         <span className="text-[var(--cl-snd-700)] text-[0.9rem] truncate">
           {message.message}
-          repellendus.
         </span>
+        {message?.images && <MdPhotoCamera />}
       </div>
     </div>
   );

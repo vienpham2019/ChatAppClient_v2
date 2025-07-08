@@ -16,11 +16,12 @@ import { getTime } from "../helper";
 import { useGetUserProfile } from "../store/userStore";
 import { useGetAllMessage } from "../store/messageStore";
 import { useGetChatRoomInfo } from "../store/chatRoomStore";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setChatRoomState } from "../store/chatRoomSlice";
 import GalleryModal from "../components/GalleryModal";
 
 const MessagesContainer = () => {
+  const { replyMessage } = useSelector((state) => state.message);
   const [inputMessage, setInputMessage] = useState("");
   const [isEmojiOpen, setIsEmojiOpen] = useState(false);
   const emojiMenuRef = useRef();
@@ -131,7 +132,9 @@ const MessagesContainer = () => {
         <div className="grid gap-1 px-[2rem]">
           <div className="grid gap-[0.2rem] rounded border border-[var(--cl-snd-200)] p-2">
             {/* reply message */}
-            <MessageReply message={messages[5]} isCloseBtn={true} />
+            {replyMessage && (
+              <MessageReply message={replyMessage} isCloseBtn={true} />
+            )}
             {/* reply message */}
             <textarea
               onChange={handleOnChange}

@@ -10,7 +10,7 @@ import { useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { setEditMessageId } from "../store/messageSlice";
 
-const MessagePopover = ({ id, isReverse = false, onClose }) => {
+const MessagePopover = ({ id, isReverse = false, onClose, onReply }) => {
   const dispatch = useDispatch();
   const reactions = [
     { emoji: "👍", label: "Thumbs Up" },
@@ -89,7 +89,7 @@ const MessagePopover = ({ id, isReverse = false, onClose }) => {
               </Tooltip>
             </div>
           ) : (
-            <div className="cursor-pointer flex items-center">
+            <div className="cursor-pointer flex items-center" onClick={onReply}>
               <Tooltip text={"Reply"}>
                 <span className="text-[1.5rem] text-[var(--cl-snd-600)]">
                   <MdOutlineReply />
